@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora FWT Samsung - Catálogo Completo</title>
+    <style>
+        :root {
+            --samsung-blue: #1428A0;
+            --samsung-black: #000000;
+            --samsung-light-gray: #f4f4f4;
+            --samsung-white: #ffffff;
+            --highlight: #2850FF;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'SamsungOne', Arial, sans-serif;
+            background-color: var(--samsung-light-gray);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--samsung-white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--samsung-blue);
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--samsung-black);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--highlight);
+            outline: none;
+            box-shadow: 0 0 5px rgba(40, 80, 255, 0.3);
+        }
+
+        .result-box {
+            background-color: #f8f9fa;
+            border: 2px solid var(--samsung-blue);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .result-item.cuota {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1428A0;
+            background: #e6f0ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .result-item.vr-final {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e31c19;
+            background: #ffebeb;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 5px;
+        }
+        
+        .result-item.total-pagado {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--samsung-black);
+            border-top: 1px solid #ccc;
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora FWT Samsung</h1>
+    <h2>Julio 2026 - Catálogo Completo</h2>
+
+    <div class="form-group" id="modelo-group">
+        <label for="modelo">Selecciona el Modelo (Móviles y Relojes):</label>
+        <select id="modelo" onchange="actualizarPlaceholder()">
+            <!-- Opciones cargadas por JS -->
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="pvp">PVP del Producto (€):</label>
+        <input type="number" id="pvp" placeholder="Ej: 599" oninput="calcularFWT()">
+    </div>
+
+    <div class="form-group">
+        <label for="plazo">Plazo Total (Incluye mes del VR):</label>
+        <select id="plazo" onchange="calcularFWT()">
+            <option value="13">13 Meses (12 cuotas + VR final)</option>
+            <option value="19">19 Meses (18 cuotas + VR final)</option>
+            <option value="25" selected>25 Meses (24 cuotas + VR final)</option>
+            <option value="37">37 Meses (36 cuotas + VR final)</option>
+        </select>
+    </div>
+
+    <div class="result-box">
+        <div class="result-item">
+            <span>PVP Introducido:</span>
+            <span id="res-pvp">0,00 €</span>
+        </div>
+        <div class="result-item">
+            <span>Descuento Directo:</span>
+            <span id="res-descuento" style="font-weight: bold;">- 0,00 €</span>
+        </div>
+        <div class="result-item">
+            <span>Importe Real a Financiar:</span>
+            <span id="res-financiar">0,00 €</span>
+        </div>
+        
+        <div class="result-item cuota">
+            <span><span id="res-meses">0</span> Cuotas Mensuales de:</span>
+            <span id="res-cuota">0,00 €</span>
+        </div>
+        <div class="result-item vr-final">
+            <span>Cuota Final (Valor Residual):</span>
+            <span id="res-vr">0,00 €</span>
+        </div>
+        
+        <div class="result-item total-pagado">
+            <span>Total pagado al finalizar:</span>
+            <span id="res-total">0,00 €</span>
+        </div>
+
+        <p style="font-size: 11px; color: #888; text-align: justify; margin-top: 15px;">
+            *Cálculo matemático exacto aplicando fórmula financiera ATOS (TIN 9.95%). Las cuotas incluyen el prorrateo de los intereses generados por el Valor Residual (VR) durante el periodo.
+        </p>
+    </div>
+</div>
+
+<script>
+    // TIN Oficial de la herramienta Excel de la financiera
+    const TIN = 0.0995; 
+
+    // Base de datos de todos los productos (Descuentos en POSITIVO para restarlos)
+    const productos = [
+        { modelo: "ZFLIP8 256GB", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100.0 },
+        { modelo: "ZFLIP8 512GB", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100.0 },
+        { modelo: "ZFOLD8 256GB", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150.0 },
+        { modelo: "ZFOLD8 512GB", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150.0 },
+        { modelo: "ZFOLD8 1TB", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150.0 },
+        { modelo: "ZFOLD8 ULTRA 256GB", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150.0 },
+        { modelo: "ZFOLD8 ULTRA 512GB", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150.0 },
+        { modelo: "ZFOLD8 ULTRA 1TB", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150.0 },
+        { modelo: "ZFLIP7 256GB", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 50.0 },
+        { modelo: "ZFLIP7 512GB", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 50.0 },
+        { modelo: "ZFOLD7 256GB", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 50.0 },
+        { modelo: "ZFOLD7 512GB", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 50.0 },
+        { modelo: "S26 256GB", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70.0 },
+        { modelo: "S26 512 GB", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70.0 },
+        { modelo: "S26+ 256GB", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70.0 },
+        { modelo: "S26+ 512GB", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70.0 },
+        { modelo: "S26 ULTRA 256GB", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100.0 },
+        { modelo: "S26 ULTRA 512GB", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100.0 },
+        { modelo: "S26 ULTRA 1TB", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100.0 },
+        { modelo: "GALAXY S25 128GB", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50.0 },
+        { modelo: "GALAXY S25 256GB", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50.0 },
+        { modelo: "GALAXY S25 512GB", VR13: 238, VR19: 202.0, VR25: 166, VR37: 112, descuento: 50.0 },
+        { modelo: "GALAXY S25 EDGE 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0 },
+        { modelo: "GALAXY S25 EDGE 512GB", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 50.0 },
+        { modelo: "GALAXY S25+ 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0 },
+        { modelo: "GALAXY S25+ 512GB", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 50.0 },
+        { modelo: "GALAXY S25 ULTRA 256GB", VR13: 279, VR19: 243.0, VR25: 207, VR37: 162, descuento: 50.0 },
+        { modelo: "GALAXY S25 ULTRA 512GB", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 50.0 },
+        { modelo: "GALAXY S25 ULTRA 1TB", VR13: 342, VR19: 297.0, VR25: 252, VR37: 211, descuento: 50.0 },
+        { modelo: "Galaxy S25 FE 256GB", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50.0 },
+        { modelo: "Galaxy S25 FE 512GB", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50.0 },
+        { modelo: "A37 256GB", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0.0 },
+        { modelo: "A57 256GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0 },
+        { modelo: "A57 512GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0 },
+        { modelo: "Watch 9 40mm Bluetooth", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80.0 },
+        { modelo: "Watch 9 40mm Cellular", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch 9 44mm Bluetooth", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch 9 44mm Cellular", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch Ultra2", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80.0 },
+        { modelo: "Watch 8 40mm BT", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80.0 },
+        { modelo: "Watch 8 40mm LTE", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch 8 44mm BT", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch 8 44mm LTE", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80.0 },
+        { modelo: "Watch 8 Classic 46mm BT", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0.0 },
+        { modelo: "Watch 8 Classic 46mm LTE", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0.0 }
+    ];
+
+    function cargarModelos() {
+        const select = document.getElementById('modelo');
+        select.innerHTML = '';
+        
+        productos.forEach((p, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            // Indicador visual para los últimos modelos
+            let label = p.modelo;
+            if(p.modelo.includes('8') && (p.modelo.includes('ZFLIP') || p.modelo.includes('ZFOLD'))) {
+                label = '🔥 ' + label;
+            }
+            option.textContent = label;
+            select.appendChild(option);
+        });
+
+        actualizarPlaceholder();
+    }
+
+    function actualizarPlaceholder() {
+        const select = document.getElementById('modelo');
+        const index = select.value;
+        const selectedDevice = productos[index];
+        
+        document.getElementById('pvp').placeholder = `PVP actual para ${selectedDevice.modelo}`;
+        calcularFWT();
+    }
+
+    function calcularFWT() {
+        const pvp = parseFloat(document.getElementById('pvp').value) || 0;
+        const plazoTotal = parseInt(document.getElementById('plazo').value); 
+        const mesesCuota = plazoTotal - 1; 
+        
+        const select = document.getElementById('modelo');
+        const selectedDevice = productos[select.value];
+
+        if (!selectedDevice || pvp === 0) {
+            resetearResultados(mesesCuota);
+            return;
+        }
+
+        const descuento = selectedDevice.descuento;
+        const vr = selectedDevice[`VR${plazoTotal}`];
+        
+        let importeFinanciar = pvp - descuento;
+        if(importeFinanciar <= 0) {
+            resetearResultados(mesesCuota);
+            return;
+        }
+
+        const capitalAmortizar = importeFinanciar - vr; 
+        const rateMensual = TIN / 12;
+
+        let cuotaExacta = 0;
+        let totalPagado = 0;
+
+        if (capitalAmortizar > 0) {
+            let pmt = (capitalAmortizar * rateMensual) / (1 - Math.pow(1 + rateMensual, -mesesCuota));
+            let interesVR = Math.round((vr * rateMensual) * 100) / 100;
+            let prorrateoVR = Math.round((interesVR / mesesCuota) * 100) / 100;
+            cuotaExacta = (Math.round(pmt * 100) / 100) + interesVR + prorrateoVR;
+            
+            // Cálculo del Total Pagado
+            totalPagado = (cuotaExacta * mesesCuota) + vr;
+        } else {
+            cuotaExacta = 0; 
+            totalPagado = vr;
+        }
+
+        document.getElementById('res-pvp').innerText = `${pvp.toFixed(2).replace('.', ',')} €`;
+        document.getElementById('res-descuento').innerText = `- ${descuento.toFixed(2).replace('.', ',')} €`;
+        document.getElementById('res-descuento').style.color = descuento > 0 ? "green" : "#e31c19";
+        
+        document.getElementById('res-financiar').innerText = `${importeFinanciar.toFixed(2).replace('.', ',')} €`;
+        
+        document.getElementById('res-meses').innerText = mesesCuota;
+        document.getElementById('res-cuota').innerText = `${cuotaExacta.toFixed(2).replace('.', ',')} €`;
+        document.getElementById('res-vr').innerText = `${vr.toFixed(2).replace('.', ',')} €`;
+        document.getElementById('res-total').innerText = `${totalPagado.toFixed(2).replace('.', ',')} €`;
+    }
+
+    function resetearResultados(mesesCuota) {
+        document.getElementById('res-pvp').innerText = `0,00 €`;
+        document.getElementById('res-descuento').innerText = `- 0,00 €`;
+        document.getElementById('res-financiar').innerText = `0,00 €`;
+        document.getElementById('res-meses').innerText = mesesCuota || 0;
+        document.getElementById('res-cuota').innerText = `0,00 €`;
+        document.getElementById('res-vr').innerText = `0,00 €`;
+        document.getElementById('res-total').innerText = `0,00 €`;
+    }
+
+    // Cargar al inicio
+    cargarModelos();
+</script>
+
+</body>
+</html>
