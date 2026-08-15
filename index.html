@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Calculadora FWT Samsung - Agosto de 2026</title>
+    <title>Calculadora FWT Samsung - Catálogo Completo</title>
     <style>
-        
+ 
         :root {
             --samsung-bg: #f2f2f7;
             --samsung-surface: #ffffff;
@@ -81,7 +81,7 @@
             backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
-            align-items: flex-end; /* Por defecto abajo para móvil */
+            align-items: flex-end; 
             z-index: 9999;
             animation: fadeInBlur 0.4s ease forwards;
             padding: 16px;
@@ -114,11 +114,10 @@
 
         .modal-scrollable-area {
             overflow-y: auto;
-            padding-right: 8px; /* Espacio para scrollbar */
+            padding-right: 8px;
             margin-bottom: 24px;
         }
 
-        /* Personalización de la barra de scroll */
         .modal-scrollable-area::-webkit-scrollbar { width: 6px; }
         .modal-scrollable-area::-webkit-scrollbar-track { background: transparent; }
         .modal-scrollable-area::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
@@ -233,7 +232,7 @@
         
         select, input {
             width: 100%;
-            height: 52px;
+            height: 52px; /* Área táctil óptima */
             padding: 0 16px;
             background-color: var(--samsung-bg);
             border: 2px solid transparent;
@@ -270,7 +269,6 @@
             overflow: hidden;
         }
 
-        /* Línea decorativa Galaxy AI superior */
         .result-card::before {
             content: '';
             position: absolute; top: 0; left: 0; right: 0; height: 4px;
@@ -292,7 +290,17 @@
 
         .row.discount .value { color: var(--samsung-green); }
 
-        /* Destacado de Cuota Mensual */
+        .value-codigo {
+            font-weight: 700;
+            color: var(--samsung-surface);
+            background-color: var(--samsung-primary);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(20, 40, 160, 0.2);
+        }
+
         .highlight-box {
             background: var(--samsung-primary-light);
             border-radius: var(--radius-sm);
@@ -304,7 +312,6 @@
         }
 
         .highlight-box::after {
-            content: '✨';
             position: absolute; right: 20px; top: 50%;
             transform: translateY(-50%); font-size: 24px; opacity: 0.9;
         }
@@ -316,7 +323,6 @@
             font-size: 36px; font-weight: 800; color: var(--samsung-primary); letter-spacing: -1px;
         }
 
-        /* Destacado Valor Residual */
         .vr-box {
             background: var(--samsung-red-light);
             border-radius: var(--radius-sm);
@@ -346,45 +352,41 @@
             padding: 0 4px;
         }
 
-        /* =========================================
-           MEDIA QUERIES (TABLET / ESCRITORIO)
-           ========================================= */
         @media (min-width: 768px) {
             body {
                 padding: 40px 24px;
-                justify-content: center; /* Centrar verticalmente en pantallas grandes */
+                justify-content: center;
             }
 
             .main-container {
-                max-width: 680px; /* Un poco más ancho en PC para que respire */
+                max-width: 680px;
             }
 
-            /* El modal pasa a ser una ventana central en vez de un panel inferior */
+           
             .modal-overlay {
                 align-items: center; 
             }
 
             .modal-content {
-                border-radius: var(--radius-md); /* Esquinas iguales en todos los lados */
+                border-radius: var(--radius-md);
                 animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 padding: 40px;
                 max-width: 650px;
             }
 
             .modal-drag-pill {
-                display: none; /* No se necesita en escritorio */
+                display: none;
             }
 
             .card, .result-card {
                 padding: 32px;
-                box-shadow: var(--shadow-lg); /* Sombras más pronunciadas en PC */
+                box-shadow: var(--shadow-lg);
             }
         }
     </style>
 </head>
 <body class="modal-open">
 
-<!-- MODAL DE AVISO -->
 <div id="aviso-modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-drag-pill"></div>
@@ -421,7 +423,6 @@
     </div>
 </div>
 
-<!-- CONTENIDO PRINCIPAL -->
 <main class="main-container">
     <div class="header-section">
         <h1>Calculadora FWT</h1>
@@ -470,6 +471,11 @@
             <span class="value" id="res-financiar">0,00 €</span>
         </div>
         
+        <div class="row" id="row-codigo" style="display: none; padding-top: 4px; padding-bottom: 12px;">
+            <span class="label" style="font-size: 13px;">Código Descuento (Caja)</span>
+            <span class="value-codigo" id="res-codigo"></span>
+        </div>
+        
         <div class="highlight-box">
             <span class="label"><span id="res-meses">0</span> Cuotas Mensuales de</span>
             <span class="value" id="res-cuota">0,00 €</span>
@@ -511,51 +517,51 @@
     const TIN = 0.0995; 
 
     const productos = [
-        { modelo: "ZFLIP8 256GB", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100.0 },
-        { modelo: "ZFLIP8 512GB", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100.0 },
-        { modelo: "ZFOLD8 256GB", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150.0 },
-        { modelo: "ZFOLD8 512GB", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150.0 },
-        { modelo: "ZFOLD8 1TB", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150.0 },
-        { modelo: "ZFOLD8 ULTRA 256GB", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150.0 },
-        { modelo: "ZFOLD8 ULTRA 512GB", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150.0 },
-        { modelo: "ZFOLD8 ULTRA 1TB", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150.0 },
-        { modelo: "ZFLIP7 256GB", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 50.0 },
-        { modelo: "ZFLIP7 512GB", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 50.0 },
-        { modelo: "ZFOLD7 256GB", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 50.0 },
-        { modelo: "ZFOLD7 512GB", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 50.0 },
-        { modelo: "S26 256GB", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70.0 },
-        { modelo: "S26 512 GB", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70.0 },
-        { modelo: "S26+ 256GB", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70.0 },
-        { modelo: "S26+ 512GB", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70.0 },
-        { modelo: "S26 ULTRA 256GB", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100.0 },
-        { modelo: "S26 ULTRA 512GB", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100.0 },
-        { modelo: "S26 ULTRA 1TB", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100.0 },
-        { modelo: "GALAXY S25 128GB", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50.0 },
-        { modelo: "GALAXY S25 256GB", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50.0 },
-        { modelo: "GALAXY S25 512GB", VR13: 238, VR19: 202.0, VR25: 166, VR37: 112, descuento: 50.0 },
-        { modelo: "GALAXY S25 EDGE 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0 },
-        { modelo: "GALAXY S25 EDGE 512GB", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 50.0 },
-        { modelo: "GALAXY S25+ 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0 },
-        { modelo: "GALAXY S25+ 512GB", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 50.0 },
-        { modelo: "GALAXY S25 ULTRA 256GB", VR13: 279, VR19: 243.0, VR25: 207, VR37: 162, descuento: 50.0 },
-        { modelo: "GALAXY S25 ULTRA 512GB", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 50.0 },
-        { modelo: "GALAXY S25 ULTRA 1TB", VR13: 342, VR19: 297.0, VR25: 252, VR37: 211, descuento: 50.0 },
-        { modelo: "Galaxy S25 FE 256GB", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50.0 },
-        { modelo: "Galaxy S25 FE 512GB", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50.0 },
-        { modelo: "A37 256GB", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0.0 },
-        { modelo: "A57 256GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0 },
-        { modelo: "A57 512GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0 },
-        { modelo: "Watch 9 40mm Bluetooth", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80.0 },
-        { modelo: "Watch 9 40mm Cellular", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch 9 44mm Bluetooth", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch 9 44mm Cellular", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch Ultra2", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80.0 },
-        { modelo: "Watch 8 40mm BT", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80.0 },
-        { modelo: "Watch 8 40mm LTE", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch 8 44mm BT", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch 8 44mm LTE", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80.0 },
-        { modelo: "Watch 8 Classic 46mm BT", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0.0 },
-        { modelo: "Watch 8 Classic 46mm LTE", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0.0 }
+        { modelo: "ZFLIP 8 256GB", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100.0, codigo: "1566965" },
+        { modelo: "ZFLIP 8 512GB", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100.0, codigo: "1566965" },
+        { modelo: "ZFOLD 8 256GB", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFOLD 8 512GB", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFOLD 8 1TB", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFOLD 8 ULTRA 256GB", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFOLD 8 ULTRA 512GB", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFOLD 8 ULTRA 1TB", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150.0, codigo: "1578392" },
+        { modelo: "ZFLIP 7 256GB", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 50.0, codigo: "1566964" },
+        { modelo: "ZFLIP 7 512GB", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 50.0, codigo: "1566964" },
+        { modelo: "ZFOLD 7 256GB", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 50.0, codigo: "1566964" },
+        { modelo: "ZFOLD 7 512GB", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S26 256GB", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70.0, codigo: "1547330" },
+        { modelo: "S26 512 GB", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70.0, codigo: "1547330" },
+        { modelo: "S26+ 256GB", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70.0, codigo: "1547330" },
+        { modelo: "S26+ 512GB", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70.0, codigo: "1547330" },
+        { modelo: "S26 ULTRA 256GB", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100.0, codigo: "1578389" },
+        { modelo: "S26 ULTRA 512GB", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100.0, codigo: "1578389" },
+        { modelo: "S26 ULTRA 1TB", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100.0, codigo: "1578389" },
+        { modelo: "S25 128GB", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 256GB", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 512GB", VR13: 238, VR19: 202.0, VR25: 166, VR37: 112, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 EDGE 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 EDGE 512GB", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25+ 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25+ 512GB", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 ULTRA 256GB", VR13: 279, VR19: 243.0, VR25: 207, VR37: 162, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 ULTRA 512GB", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 ULTRA 1TB", VR13: 342, VR19: 297.0, VR25: 252, VR37: 211, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 FE 256GB", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50.0, codigo: "1566964" },
+        { modelo: "S25 FE 512GB", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50.0, codigo: "1566964" },
+        { modelo: "A37 256GB", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0.0, codigo: "SIN DESCUENTO" },
+        { modelo: "A57 256GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0, codigo: "1566964" },
+        { modelo: "A57 512GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0, codigo: "1566964" },
+        { modelo: "WATCH 9 40mm BT", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 9 40mm LTE", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 9 44mm BT", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 9 44mm LTE", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH ULTRA 2 46mm LTE", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 8 40mm BT", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 8 40mm LTE", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 8 44mm BT", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 8 44mm LTE", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80.0, codigo: "1603358" },
+        { modelo: "WATCH 8 CLASSIC 46mm BT", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0.0, codigo: "SIN DESCUENTO" },
+        { modelo: "WATCH 8 CLASSIC 46mm LTE", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0.0, codigo: "SIN DESCUENTO" }
     ];
 
     function cargarModelos() {
@@ -566,10 +572,6 @@
             const option = document.createElement('option');
             option.value = index;
             let label = p.modelo;
-            // Destacar modelos top
-            if(p.modelo.includes('8') && (p.modelo.includes('ZFLIP') || p.modelo.includes('ZFOLD'))) {
-                label = '✨ ' + label;
-            }
             option.textContent = label;
             select.appendChild(option);
         });
@@ -605,6 +607,7 @@
 
         const descuento = selectedDevice.descuento;
         const vr = selectedDevice[`VR${plazoTotal}`];
+        const codigo = selectedDevice.codigo;
         
         let importeFinanciar = pvp - descuento;
         if(importeFinanciar <= 0) {
@@ -630,7 +633,6 @@
             totalPagado = vr;
         }
 
-        // Actualizar UI
         document.getElementById('res-pvp').innerText = formatearEuro(pvp);
         
         const uiDescuento = document.getElementById('res-descuento');
@@ -638,6 +640,16 @@
         uiDescuento.style.color = descuento > 0 ? "var(--samsung-green)" : "var(--samsung-text-muted)";
         
         document.getElementById('res-financiar').innerText = formatearEuro(importeFinanciar);
+        
+        const uiCodigoRow = document.getElementById('row-codigo');
+        const uiCodigo = document.getElementById('res-codigo');
+        
+        if (descuento > 0 && codigo && codigo !== "SIN DESCUENTO") {
+            uiCodigo.innerText = codigo;
+            uiCodigoRow.style.display = 'flex';
+        } else {
+            uiCodigoRow.style.display = 'none';
+        }
         
         document.getElementById('res-meses').innerText = mesesCuota;
         document.getElementById('res-cuota').innerText = formatearEuro(cuotaExacta);
@@ -651,13 +663,15 @@
         uiDescuento.innerText = `- 0,00 €`;
         uiDescuento.style.color = "var(--samsung-text-muted)";
         document.getElementById('res-financiar').innerText = `0,00 €`;
+        
+        document.getElementById('row-codigo').style.display = 'none';
+        
         document.getElementById('res-meses').innerText = mesesCuota || 0;
         document.getElementById('res-cuota').innerText = `0,00 €`;
         document.getElementById('res-vr').innerText = `0,00 €`;
         document.getElementById('res-total').innerText = `0,00 €`;
     }
 
-    // Inicializar app
     cargarModelos();
 </script>
 
