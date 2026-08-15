@@ -2,188 +2,514 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora FWT Samsung - Catálogo Completo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora FWT Samsung - Agosto de 2026</title>
     <style>
+        
         :root {
-            --samsung-blue: #1428A0;
-            --samsung-black: #000000;
-            --samsung-light-gray: #f4f4f4;
-            --samsung-white: #ffffff;
-            --highlight: #2850FF;
-            --border-radius: 8px;
+            --samsung-bg: #f2f2f7;
+            --samsung-surface: #ffffff;
+            --samsung-surface-hover: #fcfcfc;
+            --samsung-text-main: #1a1a1a;
+            --samsung-text-muted: #6b6b6b;
+            --samsung-primary: #1428A0;
+            --samsung-primary-light: #e6f0ff;
+            --samsung-red-light: #fff0f0;
+            --samsung-red: #e31c19;
+            --samsung-green: #0e8538;
+            --ai-gradient: linear-gradient(135deg, #4A54FF 0%, #965BFF 50%, #FF6299 100%);
+            --ai-gradient-animated: linear-gradient(270deg, #4A54FF, #965BFF, #FF6299, #4A54FF);
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 32px;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
+            --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'SamsungOne', Arial, sans-serif;
-            background-color: var(--samsung-light-gray);
-            margin: 0;
-            padding: 20px;
-            color: #333;
+            font-family: 'SamsungOne', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--samsung-bg);
+            color: var(--samsung-text-main);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .container {
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        @keyframes ai-shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInBlur {
+            from { opacity: 0; backdrop-filter: blur(0px); }
+            to { opacity: 1; backdrop-filter: blur(12px); }
+        }
+
+        /* Slide up para móvil */
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* Pop in para escritorio */
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Por defecto abajo para móvil */
+            z-index: 9999;
+            animation: fadeInBlur 0.4s ease forwards;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background-color: var(--samsung-surface);
+            width: 100%;
             max-width: 600px;
-            margin: 0 auto;
-            background-color: var(--samsung-white);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 85vh;
+            border-radius: var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
+            padding: 32px 24px 24px 24px;
+            box-shadow: var(--shadow-modal);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        h1 {
-            text-align: center;
-            color: var(--samsung-blue);
-            margin-bottom: 5px;
+        .modal-drag-pill {
+            width: 40px;
+            height: 4px;
+            background-color: #dcdcdc;
+            border-radius: 4px;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
-        h2 {
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-            margin-top: 0;
-            margin-bottom: 25px;
+        .modal-scrollable-area {
+            overflow-y: auto;
+            padding-right: 8px; /* Espacio para scrollbar */
+            margin-bottom: 24px;
+        }
+
+        /* Personalización de la barra de scroll */
+        .modal-scrollable-area::-webkit-scrollbar { width: 6px; }
+        .modal-scrollable-area::-webkit-scrollbar-track { background: transparent; }
+        .modal-scrollable-area::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
+
+        .modal-content h1 {
+            color: var(--samsung-primary);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        
+        .modal-content h1.es-title { color: var(--samsung-red); }
+
+        .modal-content h2 {
+            font-size: 18px;
+            margin: 24px 0 16px 0;
+        }
+
+        .modal-content p {
+            font-size: 15px;
+            color: var(--samsung-text-muted);
+            margin-bottom: 16px;
+        }
+
+        .modal-content hr {
+            border: none;
+            height: 1px;
+            background-color: #e5e5ea;
+            margin: 24px 0;
+        }
+
+        .modal-content blockquote {
+            border-left: 4px solid var(--samsung-primary);
+            background-color: var(--samsung-bg);
+            padding: 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin-bottom: 16px;
+        }
+
+        .modal-content blockquote p { margin: 0; color: var(--samsung-text-main); }
+        .modal-content blockquote p:last-child { color: var(--samsung-text-muted); font-size: 14px; margin-top: 4px; }
+
+        .btn-aceptar {
+            background: var(--ai-gradient-animated);
+            background-size: 200% 200%;
+            animation: ai-shimmer 4s ease infinite;
+            color: var(--samsung-surface);
+            border: none;
+            padding: 18px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(150, 91, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        .btn-aceptar:active { transform: scale(0.98); }
+
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            padding-bottom: 40px;
+        }
+
+        .header-section {
+            padding: 16px 8px 24px 8px;
+        }
+
+        .header-section h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--samsung-text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .header-section p {
+            font-size: 15px;
+            color: var(--samsung-text-muted);
+        }
+
+        .card {
+            background-color: var(--samsung-surface);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            transition: box-shadow 0.3s ease;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
 
         label {
             display: block;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 8px;
-            color: var(--samsung-black);
+            color: var(--samsung-text-main);
+            padding-left: 4px;
         }
 
+        .input-wrapper { position: relative; }
+        
         select, input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: var(--border-radius);
+            height: 52px;
+            padding: 0 16px;
+            background-color: var(--samsung-bg);
+            border: 2px solid transparent;
+            border-radius: var(--radius-sm);
             font-size: 16px;
-            box-sizing: border-box;
-            background-color: #fff;
+            font-family: inherit;
+            color: var(--samsung-text-main);
+            transition: all 0.2s ease;
+            appearance: none;
         }
 
         select:focus, input:focus {
-            border-color: var(--highlight);
             outline: none;
-            box-shadow: 0 0 5px rgba(40, 80, 255, 0.3);
+            background-color: var(--samsung-surface);
+            border-color: #965BFF;
+            box-shadow: 0 0 0 4px rgba(150, 91, 255, 0.1);
         }
 
-        .result-box {
-            background-color: #f8f9fa;
-            border: 2px solid var(--samsung-blue);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-top: 25px;
+        .input-wrapper.select::after {
+            content: "▼";
+            font-size: 12px;
+            color: var(--samsung-text-muted);
+            position: absolute; right: 16px; top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
         }
 
-        .result-item {
+        .result-card {
+            background-color: var(--samsung-surface);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Línea decorativa Galaxy AI superior */
+        .result-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--ai-gradient-animated);
+            background-size: 200% 200%;
+            animation: ai-shimmer 3s ease infinite;
+        }
+
+        .row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .result-item.cuota {
-            font-size: 22px;
-            font-weight: bold;
-            color: #1428A0;
-            background: #e6f0ff;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-
-        .result-item.vr-final {
-            font-size: 18px;
-            font-weight: bold;
-            color: #e31c19;
-            background: #ffebeb;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 5px;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 15px;
         }
         
-        .result-item.total-pagado {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--samsung-black);
-            border-top: 1px solid #ccc;
-            padding-top: 15px;
-            margin-top: 5px;
+        .row .label { color: var(--samsung-text-muted); }
+        .row .value { font-weight: 600; color: var(--samsung-text-main); }
+
+        .row.discount .value { color: var(--samsung-green); }
+
+        /* Destacado de Cuota Mensual */
+        .highlight-box {
+            background: var(--samsung-primary-light);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .highlight-box::after {
+            content: '✨';
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); font-size: 24px; opacity: 0.9;
+        }
+
+        .highlight-box .label {
+            font-size: 14px; color: var(--samsung-primary); font-weight: 600; margin-bottom: 4px;
+        }
+        .highlight-box .value {
+            font-size: 36px; font-weight: 800; color: var(--samsung-primary); letter-spacing: -1px;
+        }
+
+        /* Destacado Valor Residual */
+        .vr-box {
+            background: var(--samsung-red-light);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vr-box .label { font-size: 14px; color: var(--samsung-red); font-weight: 600; }
+        .vr-box .value { font-size: 18px; color: var(--samsung-red); font-weight: 700; }
+
+        .row.total {
+            border-top: 1px solid #eee;
+            padding-top: 16px;
+            margin-top: 8px;
+        }
+        .row.total .value { font-size: 20px; font-weight: 800; }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #8e8e93;
+            text-align: justify;
+            margin-top: 24px;
+            line-height: 1.5;
+            padding: 0 4px;
+        }
+
+        /* =========================================
+           MEDIA QUERIES (TABLET / ESCRITORIO)
+           ========================================= */
+        @media (min-width: 768px) {
+            body {
+                padding: 40px 24px;
+                justify-content: center; /* Centrar verticalmente en pantallas grandes */
+            }
+
+            .main-container {
+                max-width: 680px; /* Un poco más ancho en PC para que respire */
+            }
+
+            /* El modal pasa a ser una ventana central en vez de un panel inferior */
+            .modal-overlay {
+                align-items: center; 
+            }
+
+            .modal-content {
+                border-radius: var(--radius-md); /* Esquinas iguales en todos los lados */
+                animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                padding: 40px;
+                max-width: 650px;
+            }
+
+            .modal-drag-pill {
+                display: none; /* No se necesita en escritorio */
+            }
+
+            .card, .result-card {
+                padding: 32px;
+                box-shadow: var(--shadow-lg); /* Sombras más pronunciadas en PC */
+            }
         }
     </style>
 </head>
-<body>
+<body class="modal-open">
 
-<div class="container">
-    <h1>Calculadora FWT Samsung</h1>
-    <h2>Julio 2026 - Catálogo Completo</h2>
-
-    <div class="form-group" id="modelo-group">
-        <label for="modelo">Selecciona el Modelo (Móviles y Relojes):</label>
-        <select id="modelo" onchange="actualizarPlaceholder()">
-            <!-- Opciones cargadas por JS -->
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="pvp">PVP del Producto (€):</label>
-        <input type="number" id="pvp" placeholder="Ej: 599" oninput="calcularFWT()">
-    </div>
-
-    <div class="form-group">
-        <label for="plazo">Plazo Total (Incluye mes del VR):</label>
-        <select id="plazo" onchange="calcularFWT()">
-            <option value="13">13 Meses (12 cuotas + VR final)</option>
-            <option value="19">19 Meses (18 cuotas + VR final)</option>
-            <option value="25" selected>25 Meses (24 cuotas + VR final)</option>
-            <option value="37">37 Meses (36 cuotas + VR final)</option>
-        </select>
-    </div>
-
-    <div class="result-box">
-        <div class="result-item">
-            <span>PVP Introducido:</span>
-            <span id="res-pvp">0,00 €</span>
-        </div>
-        <div class="result-item">
-            <span>Descuento Directo:</span>
-            <span id="res-descuento" style="font-weight: bold;">- 0,00 €</span>
-        </div>
-        <div class="result-item">
-            <span>Importe Real a Financiar:</span>
-            <span id="res-financiar">0,00 €</span>
-        </div>
+<!-- MODAL DE AVISO -->
+<div id="aviso-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-drag-pill"></div>
         
-        <div class="result-item cuota">
-            <span><span id="res-meses">0</span> Cuotas Mensuales de:</span>
-            <span id="res-cuota">0,00 €</span>
-        </div>
-        <div class="result-item vr-final">
-            <span>Cuota Final (Valor Residual):</span>
-            <span id="res-vr">0,00 €</span>
-        </div>
-        
-        <div class="result-item total-pagado">
-            <span>Total pagado al finalizar:</span>
-            <span id="res-total">0,00 €</span>
+        <div class="modal-scrollable-area">
+            <h1 class="es-title">IMPORTANTE LEER!! (ESP)</h1>
+            <p><strong>Herramienta de Fordward Trade-In de Samsung</strong></p>
+            <p>Esta herramienta simula la financiación Fordward Trade-In de Mediamarkt España, es una herramienta totalmente orientativa y el resultado puede variar dependiendo de la tienda, región u otras promociones. Esta herramienta está creada con la finalidad de poder agilizar y facilitar la venta usando este método ya que representa un desglose visual.</p>
+            <p><strong>El promotor debe de comentarle al cliente que és orientativo 100%.</strong></p>
+            
+            <hr>
+
+            <h1>IMPORTANT LLEGIR!! (CAT)</h1>
+            <p><strong>Eina de Fordward Trade-In de Samsung</strong></p>
+            <p>Aquesta eina simula el finançament Fordward Trade-In de Mediamarkt Espanya, és una eina totalment orientativa i el resultat pot variar depenent de la botiga, regió o altres promocions. Aquesta eina està creada amb la finalitat de poder agilitar i facilitar la venda utilitzant aquest mètode ja que representa un desglossament visual.</p>
+            <p><strong>El promotor ha de comentar al client que és totalment orientativa 100%.</strong></p>
+
+            <hr>
+
+            <h2>FAQs</h2>
+            
+            <blockquote>
+                <p><strong>¿Los descuentos se van a ir actualizando?</strong></p>
+                <p>Si, la página web irá actualizando los descuentos de los terminales de Samsung.</p>
+            </blockquote>
+
+            <blockquote>
+                <p><strong>¿Los datos que se muestran son fieles al sistema de MediaMarkt?</strong></p>
+                <p>No, como bien se ha dicho antes, los datos pueden variar dependiendo de la tienda, región u otras promociones.</p>
+            </blockquote>
         </div>
 
-        <p style="font-size: 11px; color: #888; text-align: justify; margin-top: 15px;">
-            *Cálculo matemático exacto aplicando fórmula financiera ATOS (TIN 9.95%). Las cuotas incluyen el prorrateo de los intereses generados por el Valor Residual (VR) durante el periodo.
-        </p>
+        <button class="btn-aceptar" onclick="cerrarModal()">He leído y acepto</button>
     </div>
 </div>
 
+<!-- CONTENIDO PRINCIPAL -->
+<main class="main-container">
+    <div class="header-section">
+        <h1>Calculadora FWT</h1>
+        <p>Samsung • Catálogo Julio 2026</p>
+    </div>
+
+    <div class="card">
+        <div class="form-group">
+            <label for="modelo">Modelo de dispositivo</label>
+            <div class="input-wrapper select">
+                <select id="modelo" onchange="actualizarPlaceholder()"></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="pvp">PVP del Producto (€)</label>
+            <div class="input-wrapper">
+                <input type="number" id="pvp" placeholder="Ej: 599" oninput="calcularFWT()">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="plazo">Plazo Total (Incluye mes del VR)</label>
+            <div class="input-wrapper select">
+                <select id="plazo" onchange="calcularFWT()">
+                    <option value="13">13 Meses (12 cuotas + VR)</option>
+                    <option value="19">19 Meses (18 cuotas + VR)</option>
+                    <option value="25" selected>25 Meses (24 cuotas + VR)</option>
+                    <option value="37">37 Meses (36 cuotas + VR)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-card">
+        <div class="row">
+            <span class="label">PVP Introducido</span>
+            <span class="value" id="res-pvp">0,00 €</span>
+        </div>
+        <div class="row discount">
+            <span class="label">Descuento Directo</span>
+            <span class="value" id="res-descuento">- 0,00 €</span>
+        </div>
+        <div class="row">
+            <span class="label">Importe a Financiar</span>
+            <span class="value" id="res-financiar">0,00 €</span>
+        </div>
+        
+        <div class="highlight-box">
+            <span class="label"><span id="res-meses">0</span> Cuotas Mensuales de</span>
+            <span class="value" id="res-cuota">0,00 €</span>
+        </div>
+        
+        <div class="vr-box">
+            <span class="label">Valor Residual (Última cuota)</span>
+            <span class="value" id="res-vr">0,00 €</span>
+        </div>
+        
+        <div class="row total">
+            <span class="label">Total pagado al finalizar</span>
+            <span class="value" id="res-total">0,00 €</span>
+        </div>
+
+        <p class="disclaimer">
+            *Cálculo matemático exacto aplicando fórmula financiera ATOS (TIN 9.95%). Las cuotas incluyen el prorrateo de los intereses generados por el Valor Residual (VR) durante el periodo.
+        </p>
+    </div>
+</main>
+
 <script>
-    // TIN Oficial de la herramienta Excel de la financiera
+    function cerrarModal() {
+        const modal = document.getElementById('aviso-modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        // Animación de salida fluida
+        modal.style.transition = 'opacity 0.3s ease';
+        modal.style.opacity = '0';
+        modalContent.style.transition = 'transform 0.3s ease';
+        modalContent.style.transform = window.innerWidth < 768 ? 'translateY(100%)' : 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }, 300);
+    }
+
     const TIN = 0.0995; 
 
-    // Base de datos de todos los productos (Descuentos en POSITIVO para restarlos)
     const productos = [
         { modelo: "ZFLIP8 256GB", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100.0 },
         { modelo: "ZFLIP8 512GB", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100.0 },
@@ -239,10 +565,10 @@
         productos.forEach((p, index) => {
             const option = document.createElement('option');
             option.value = index;
-            // Indicador visual para los últimos modelos
             let label = p.modelo;
+            // Destacar modelos top
             if(p.modelo.includes('8') && (p.modelo.includes('ZFLIP') || p.modelo.includes('ZFOLD'))) {
-                label = '🔥 ' + label;
+                label = '✨ ' + label;
             }
             option.textContent = label;
             select.appendChild(option);
@@ -256,8 +582,12 @@
         const index = select.value;
         const selectedDevice = productos[index];
         
-        document.getElementById('pvp').placeholder = `PVP actual para ${selectedDevice.modelo}`;
+        document.getElementById('pvp').placeholder = `PVP para ${selectedDevice.modelo}`;
         calcularFWT();
+    }
+
+    function formatearEuro(numero) {
+        return numero.toFixed(2).replace('.', ',') + ' €';
     }
 
     function calcularFWT() {
@@ -294,28 +624,32 @@
             let prorrateoVR = Math.round((interesVR / mesesCuota) * 100) / 100;
             cuotaExacta = (Math.round(pmt * 100) / 100) + interesVR + prorrateoVR;
             
-            // Cálculo del Total Pagado
             totalPagado = (cuotaExacta * mesesCuota) + vr;
         } else {
             cuotaExacta = 0; 
             totalPagado = vr;
         }
 
-        document.getElementById('res-pvp').innerText = `${pvp.toFixed(2).replace('.', ',')} €`;
-        document.getElementById('res-descuento').innerText = `- ${descuento.toFixed(2).replace('.', ',')} €`;
-        document.getElementById('res-descuento').style.color = descuento > 0 ? "green" : "#e31c19";
+        // Actualizar UI
+        document.getElementById('res-pvp').innerText = formatearEuro(pvp);
         
-        document.getElementById('res-financiar').innerText = `${importeFinanciar.toFixed(2).replace('.', ',')} €`;
+        const uiDescuento = document.getElementById('res-descuento');
+        uiDescuento.innerText = '- ' + formatearEuro(descuento);
+        uiDescuento.style.color = descuento > 0 ? "var(--samsung-green)" : "var(--samsung-text-muted)";
+        
+        document.getElementById('res-financiar').innerText = formatearEuro(importeFinanciar);
         
         document.getElementById('res-meses').innerText = mesesCuota;
-        document.getElementById('res-cuota').innerText = `${cuotaExacta.toFixed(2).replace('.', ',')} €`;
-        document.getElementById('res-vr').innerText = `${vr.toFixed(2).replace('.', ',')} €`;
-        document.getElementById('res-total').innerText = `${totalPagado.toFixed(2).replace('.', ',')} €`;
+        document.getElementById('res-cuota').innerText = formatearEuro(cuotaExacta);
+        document.getElementById('res-vr').innerText = formatearEuro(vr);
+        document.getElementById('res-total').innerText = formatearEuro(totalPagado);
     }
 
     function resetearResultados(mesesCuota) {
         document.getElementById('res-pvp').innerText = `0,00 €`;
-        document.getElementById('res-descuento').innerText = `- 0,00 €`;
+        const uiDescuento = document.getElementById('res-descuento');
+        uiDescuento.innerText = `- 0,00 €`;
+        uiDescuento.style.color = "var(--samsung-text-muted)";
         document.getElementById('res-financiar').innerText = `0,00 €`;
         document.getElementById('res-meses').innerText = mesesCuota || 0;
         document.getElementById('res-cuota').innerText = `0,00 €`;
@@ -323,7 +657,7 @@
         document.getElementById('res-total').innerText = `0,00 €`;
     }
 
-    // Cargar al inicio
+    // Inicializar app
     cargarModelos();
 </script>
 
