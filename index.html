@@ -2,678 +2,1084 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Calculadora FWT Samsung - Catálogo Completo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samsung FWT Calculator — One UI Glass Edition</title>
+    <!-- SheetJS para procesar Excels en cliente -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
- 
         :root {
-            --samsung-bg: #f2f2f7;
-            --samsung-surface: #ffffff;
-            --samsung-surface-hover: #fcfcfc;
-            --samsung-text-main: #1a1a1a;
-            --samsung-text-muted: #6b6b6b;
-            --samsung-primary: #1428A0;
-            --samsung-primary-light: #e6f0ff;
-            --samsung-red-light: #fff0f0;
-            --samsung-red: #e31c19;
-            --samsung-green: #0e8538;
-            --ai-gradient: linear-gradient(135deg, #4A54FF 0%, #965BFF 50%, #FF6299 100%);
-            --ai-gradient-animated: linear-gradient(270deg, #4A54FF, #965BFF, #FF6299, #4A54FF);
-            --radius-sm: 12px;
-            --radius-md: 20px;
-            --radius-lg: 32px;
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
-            --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.2);
+            --samsung-blue: #1428A0;
+            --samsung-accent: #2563EB;
+            --samsung-glow: rgba(37, 99, 235, 0.35);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-card: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 16px 40px rgba(0, 20, 60, 0.12);
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --success: #059669;
+            --danger: #DC2626;
+            --radius-xl: 24px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'SamsungOne', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'SamsungOne', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--samsung-bg);
-            color: var(--samsung-text-main);
-            -webkit-font-smoothing: antialiased;
-            line-height: 1.5;
-            padding: 16px;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        body.modal-open {
-            overflow: hidden;
-        }
-
-        @keyframes ai-shimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes fadeInBlur {
-            from { opacity: 0; backdrop-filter: blur(0px); }
-            to { opacity: 1; backdrop-filter: blur(12px); }
-        }
-
-        /* Slide up para móvil */
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        /* Pop in para escritorio */
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
+            background: radial-gradient(circle at 10% 20%, #E0E7FF 0%, #F1F5F9 45%, #E2E8F0 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            padding: 24px 16px 60px;
             display: flex;
             justify-content: center;
-            align-items: flex-end; 
-            z-index: 9999;
-            animation: fadeInBlur 0.4s ease forwards;
-            padding: 16px;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .modal-content {
-            background-color: var(--samsung-surface);
+        /* Ambient Glow Blobs */
+        .ambient-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+        .blob-1 {
+            width: 380px;
+            height: 380px;
+            background: #93C5FD;
+            top: -80px;
+            left: -80px;
+        }
+        .blob-2 {
+            width: 320px;
+            height: 320px;
+            background: #C7D2FE;
+            bottom: -60px;
+            right: -60px;
+            animation-delay: -4s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95) translate(0, 0); opacity: 0.5; }
+            100% { transform: scale(1.1) translate(20px, 20px); opacity: 0.75; }
+        }
+
+        .main-wrapper {
             width: 100%;
-            max-width: 600px;
-            max-height: 85vh;
-            border-radius: var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-md);
-            padding: 32px 24px 24px 24px;
-            box-shadow: var(--shadow-modal);
+            max-width: 820px;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--glass-shadow);
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+        .app-title h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--samsung-blue), #1E40AF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .app-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+        }
+        .status-badge {
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--samsung-accent);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Trigger Sidebar Button */
+        .btn-sidebar-toggle {
+            background: var(--glass-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-sidebar-toggle:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px var(--samsung-glow);
+        }
+
+        /* Categories Pills */
+        .category-nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            margin-bottom: 20px;
+            scrollbar-width: none;
+        }
+        .category-nav::-webkit-scrollbar { display: none; }
+        .cat-pill {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        .cat-pill.active {
+            background: var(--samsung-blue);
+            color: #fff;
+            box-shadow: 0 4px 14px var(--samsung-glow);
+            border-color: transparent;
+        }
+
+        /* Form Inputs */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        @media (min-width: 600px) {
+            .input-grid {
+                grid-template-columns: 2fr 1.2fr;
+            }
+        }
+        .field-group {
             display: flex;
             flex-direction: column;
-            position: relative;
-            animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            gap: 6px;
         }
-
-        .modal-drag-pill {
-            width: 40px;
-            height: 4px;
-            background-color: #dcdcdc;
-            border-radius: 4px;
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .modal-scrollable-area {
-            overflow-y: auto;
-            padding-right: 8px;
-            margin-bottom: 24px;
-        }
-
-        .modal-scrollable-area::-webkit-scrollbar { width: 6px; }
-        .modal-scrollable-area::-webkit-scrollbar-track { background: transparent; }
-        .modal-scrollable-area::-webkit-scrollbar-thumb { background: #dcdcdc; border-radius: 10px; }
-
-        .modal-content h1 {
-            color: var(--samsung-primary);
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-        
-        .modal-content h1.es-title { color: var(--samsung-red); }
-
-        .modal-content h2 {
-            font-size: 18px;
-            margin: 24px 0 16px 0;
-        }
-
-        .modal-content p {
-            font-size: 15px;
-            color: var(--samsung-text-muted);
-            margin-bottom: 16px;
-        }
-
-        .modal-content hr {
-            border: none;
-            height: 1px;
-            background-color: #e5e5ea;
-            margin: 24px 0;
-        }
-
-        .modal-content blockquote {
-            border-left: 4px solid var(--samsung-primary);
-            background-color: var(--samsung-bg);
-            padding: 16px;
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-            margin-bottom: 16px;
-        }
-
-        .modal-content blockquote p { margin: 0; color: var(--samsung-text-main); }
-        .modal-content blockquote p:last-child { color: var(--samsung-text-muted); font-size: 14px; margin-top: 4px; }
-
-        .btn-aceptar {
-            background: var(--ai-gradient-animated);
-            background-size: 200% 200%;
-            animation: ai-shimmer 4s ease infinite;
-            color: var(--samsung-surface);
-            border: none;
-            padding: 18px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 8px 20px rgba(150, 91, 255, 0.25);
-            flex-shrink: 0;
-        }
-
-        .btn-aceptar:active { transform: scale(0.98); }
-
-        .main-container {
-            width: 100%;
-            max-width: 600px;
-            padding-bottom: 40px;
-        }
-
-        .header-section {
-            padding: 16px 8px 24px 8px;
-        }
-
-        .header-section h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--samsung-text-main);
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-        }
-
-        .header-section p {
-            font-size: 15px;
-            color: var(--samsung-text-muted);
-        }
-
-        .card {
-            background-color: var(--samsung-surface);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 24px;
-            transition: box-shadow 0.3s ease;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--samsung-text-main);
-            padding-left: 4px;
-        }
-
-        .input-wrapper { position: relative; }
-        
-        select, input {
-            width: 100%;
-            height: 52px; /* Área táctil óptima */
-            padding: 0 16px;
-            background-color: var(--samsung-bg);
-            border: 2px solid transparent;
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-family: inherit;
-            color: var(--samsung-text-main);
-            transition: all 0.2s ease;
-            appearance: none;
-        }
-
-        select:focus, input:focus {
-            outline: none;
-            background-color: var(--samsung-surface);
-            border-color: #965BFF;
-            box-shadow: 0 0 0 4px rgba(150, 91, 255, 0.1);
-        }
-
-        .input-wrapper.select::after {
-            content: "▼";
+        .field-label {
             font-size: 12px;
-            color: var(--samsung-text-muted);
-            position: absolute; right: 16px; top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        .glass-select, .glass-input {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1.5px solid rgba(203, 213, 225, 0.7);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .glass-select:focus, .glass-input:focus {
+            border-color: var(--samsung-accent);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
-        .result-card {
-            background-color: var(--samsung-surface);
+        /* Plazos Selector Tabs */
+        .plazos-container {
+            margin-top: 18px;
+        }
+        .plazo-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            background: rgba(226, 232, 240, 0.6);
+            padding: 5px;
             border-radius: var(--radius-md);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
+        }
+        .plazo-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 4px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .plazo-btn.active {
+            background: #FFFFFF;
+            color: var(--samsung-blue);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Hero Results Card */
+        .hero-result {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,255,0.85));
+            border-top: 3px solid var(--samsung-blue);
+        }
+        .quote-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .monthly-highlight {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, #1428A0, #1E3A8A);
+            border-radius: var(--radius-md);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(20, 40, 160, 0.25);
             position: relative;
             overflow: hidden;
         }
-
-        .result-card::before {
+        .monthly-highlight::after {
             content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 4px;
-            background: var(--ai-gradient-animated);
-            background-size: 200% 200%;
-            animation: ai-shimmer 3s ease infinite;
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        .monthly-label {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        .monthly-val {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .monthly-val span {
+            font-size: 18px;
+            font-weight: 600;
         }
 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 15px;
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
         }
-        
-        .row .label { color: var(--samsung-text-muted); }
-        .row .value { font-weight: 600; color: var(--samsung-text-main); }
-
-        .row.discount .value { color: var(--samsung-green); }
-
-        .value-codigo {
-            font-weight: 700;
-            color: var(--samsung-surface);
-            background-color: var(--samsung-primary);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(20, 40, 160, 0.2);
+        @media (min-width: 550px) {
+            .metrics-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
-
-        .highlight-box {
-            background: var(--samsung-primary-light);
-            border-radius: var(--radius-sm);
-            padding: 20px;
-            margin: 16px 0;
+        .metric-card {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
             display: flex;
             flex-direction: column;
-            position: relative;
+            gap: 4px;
+        }
+        .metric-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .metric-number {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .metric-number.discount {
+            color: var(--success);
+        }
+        .metric-number.vr {
+            color: var(--danger);
         }
 
-        .highlight-box::after {
-            position: absolute; right: 20px; top: 50%;
-            transform: translateY(-50%); font-size: 24px; opacity: 0.9;
-        }
-
-        .highlight-box .label {
-            font-size: 14px; color: var(--samsung-primary); font-weight: 600; margin-bottom: 4px;
-        }
-        .highlight-box .value {
-            font-size: 36px; font-weight: 800; color: var(--samsung-primary); letter-spacing: -1px;
-        }
-
-        .vr-box {
-            background: var(--samsung-red-light);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            margin-bottom: 16px;
+        /* Total Section */
+        .total-strip {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 14px 18px;
+            background: rgba(241, 245, 249, 0.75);
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 16px;
+            border: 1px dashed #CBD5E1;
+        }
+        .total-amount {
+            color: var(--samsung-blue);
+            font-size: 20px;
         }
 
-        .vr-box .label { font-size: 14px; color: var(--samsung-red); font-weight: 600; }
-        .vr-box .value { font-size: 18px; color: var(--samsung-red); font-weight: 700; }
-
-        .row.total {
-            border-top: 1px solid #eee;
-            padding-top: 16px;
-            margin-top: 8px;
+        /* Timeline Section */
+        .timeline-wrapper {
+            margin-top: 10px;
         }
-        .row.total .value { font-size: 20px; font-weight: 800; }
-
-        .disclaimer {
+        .timeline-header {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .timeline-bar {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        .timeline-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 34px;
+            bottom: 0;
+            width: 2px;
+            background: #CBD5E1;
+        }
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #FFFFFF;
+            border: 2px solid var(--samsung-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--samsung-blue);
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            z-index: 1;
+        }
+        .step-icon.final {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: #FEF2F2;
+        }
+        .step-info {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+        }
+        .step-title {
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+        }
+        .step-desc {
             font-size: 12px;
-            color: #8e8e93;
-            text-align: justify;
-            margin-top: 24px;
-            line-height: 1.5;
-            padding: 0 4px;
+            color: var(--text-secondary);
+            margin-top: 3px;
         }
 
-        @media (min-width: 768px) {
-            body {
-                padding: 40px 24px;
-                justify-content: center;
-            }
+        /* Floating Sidebar Drawer */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .floating-sidebar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            bottom: 20px;
+            width: 360px;
+            max-width: calc(100vw - 40px);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            z-index: 101;
+            transform: translateX(110%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .floating-sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            padding: 20px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .sidebar-header h3 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .btn-close-sidebar {
+            background: #F1F5F9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 800;
+            color: var(--text-secondary);
+        }
+        .sidebar-body {
+            padding: 20px 22px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
 
-            .main-container {
-                max-width: 680px;
-            }
+        /* File Upload Box */
+        .upload-dropzone {
+            border: 2px dashed #94A3B8;
+            border-radius: var(--radius-md);
+            padding: 24px 16px;
+            text-align: center;
+            background: rgba(248, 250, 252, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .upload-dropzone:hover {
+            border-color: var(--samsung-accent);
+            background: rgba(239, 246, 255, 0.8);
+        }
+        .upload-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .upload-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .upload-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
 
-           
-            .modal-overlay {
-                align-items: center; 
-            }
+        /* Action Buttons */
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            background: var(--samsung-blue);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--samsung-glow);
+        }
+        .btn-action:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: #F1F5F9;
+            color: var(--text-secondary);
+            box-shadow: none;
+            margin-top: 6px;
+        }
 
-            .modal-content {
-                border-radius: var(--radius-md);
-                animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-                padding: 40px;
-                max-width: 650px;
-            }
-
-            .modal-drag-pill {
-                display: none;
-            }
-
-            .card, .result-card {
-                padding: 32px;
-                box-shadow: var(--shadow-lg);
-            }
+        .helper-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
         }
     </style>
 </head>
-<body class="modal-open">
+<body>
 
-<div id="aviso-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-drag-pill"></div>
+    <!-- Ambient Glow Blobs -->
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+
+    <div class="main-wrapper">
         
-        <div class="modal-scrollable-area">
-            <h1 class="es-title">IMPORTANTE LEER!! (ESP)</h1>
-            <p><strong>Herramienta de Fordward Trade-In de Samsung</strong></p>
-            <p>Esta herramienta simula la financiación Fordward Trade-In de Mediamarkt España, es una herramienta totalmente orientativa y el resultado puede variar dependiendo de la tienda, región u otras promociones. Esta herramienta está creada con la finalidad de poder agilizar y facilitar la venta usando este método ya que representa un desglose visual.</p>
-            <p><strong>El promotor debe de comentarle al cliente que és orientativo 100%.</strong></p>
-            
-            <hr>
-
-            <h1>IMPORTANT LLEGIR!! (CAT)</h1>
-            <p><strong>Eina de Fordward Trade-In de Samsung</strong></p>
-            <p>Aquesta eina simula el finançament Fordward Trade-In de Mediamarkt Espanya, és una eina totalment orientativa i el resultat pot variar depenent de la botiga, regió o altres promocions. Aquesta eina està creada amb la finalitat de poder agilitar i facilitar la venda utilitzant aquest mètode ja que representa un desglossament visual.</p>
-            <p><strong>El promotor ha de comentar al client que és totalment orientativa 100%.</strong></p>
-
-            <hr>
-
-            <h2>FAQs</h2>
-            
-            <blockquote>
-                <p><strong>¿Los descuentos se van a ir actualizando?</strong></p>
-                <p>Si, la página web irá actualizando los descuentos de los terminales de Samsung.</p>
-            </blockquote>
-
-            <blockquote>
-                <p><strong>¿Los datos que se muestran son fieles al sistema de MediaMarkt?</strong></p>
-                <p>No, como bien se ha dicho antes, los datos pueden variar dependiendo de la tienda, región u otras promociones.</p>
-            </blockquote>
-        </div>
-
-        <button class="btn-aceptar" onclick="cerrarModal()">He leído y acepto</button>
-    </div>
-</div>
-
-<main class="main-container">
-    <div class="header-section">
-        <h1>Calculadora FWT</h1>
-        <p>Samsung • Catálogo Julio 2026</p>
-    </div>
-
-    <div class="card">
-        <div class="form-group">
-            <label for="modelo">Modelo de dispositivo</label>
-            <div class="input-wrapper select">
-                <select id="modelo" onchange="actualizarPlaceholder()"></select>
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-title">
+                <h1>Samsung FWT Pro</h1>
+                <div class="app-subtitle">
+                    <span id="label-tarifa">Tarifa Octubre 2026</span>
+                    <span class="status-badge" id="product-counter">48 Modelos</span>
+                </div>
             </div>
-        </div>
+            <button class="btn-sidebar-toggle" onclick="toggleSidebar()" title="Herramientas y Actualizaciones">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1428A0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </header>
 
-        <div class="form-group">
-            <label for="pvp">PVP del Producto (€)</label>
-            <div class="input-wrapper">
-                <input type="number" id="pvp" placeholder="Ej: 599" oninput="calcularFWT()">
+        <!-- Category Nav -->
+        <nav class="category-nav">
+            <button class="cat-pill active" onclick="filtrarCategoria('ALL', this)">Todos</button>
+            <button class="cat-pill" onclick="filtrarCategoria('GALAXY Z', this)">Galaxy Z Series 🔥</button>
+            <button class="cat-pill" onclick="filtrarCategoria('GALAXY S', this)">Galaxy S Series</button>
+            <button class="cat-pill" onclick="filtrarCategoria('GALAXY WATCH', this)">Galaxy Watch</button>
+            <button class="cat-pill" onclick="filtrarCategoria('GALAXY A', this)">Galaxy A</button>
+        </nav>
+
+        <!-- Card Selector de Modelo & PVP -->
+        <section class="glass-card">
+            <div class="input-grid">
+                <div class="field-group">
+                    <label class="field-label" for="select-modelo">Dispositivo Samsung</label>
+                    <select id="select-modelo" class="glass-select" onchange="alCambiarModelo()">
+                        <!-- Opciones generadas por JS -->
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="input-pvp">PVP en Tienda (€)</label>
+                    <input type="number" id="input-pvp" class="glass-input" placeholder="Ej: 599" step="0.01" oninput="calcular()">
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="plazo">Plazo Total (Incluye mes del VR)</label>
-            <div class="input-wrapper select">
-                <select id="plazo" onchange="calcularFWT()">
-                    <option value="13">13 Meses (12 cuotas + VR)</option>
-                    <option value="19">19 Meses (18 cuotas + VR)</option>
-                    <option value="25" selected>25 Meses (24 cuotas + VR)</option>
-                    <option value="37">37 Meses (36 cuotas + VR)</option>
-                </select>
+            <!-- Plazos -->
+            <div class="plazos-container">
+                <label class="field-label" style="margin-bottom: 6px; display: block;">Modalidad de Financiación (Forward Trade)</label>
+                <div class="plazo-selector">
+                    <button class="plazo-btn" onclick="seleccionarPlazo(13, this)">13 Meses<br><small>(12 + VR)</small></button>
+                    <button class="plazo-btn" onclick="seleccionarPlazo(19, this)">19 Meses<br><small>(18 + VR)</small></button>
+                    <button class="plazo-btn active" onclick="seleccionarPlazo(25, this)">25 Meses<br><small>(24 + VR)</small></button>
+                    <button class="plazo-btn" onclick="seleccionarPlazo(37, this)">37 Meses<br><small>(36 + VR)</small></button>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="result-card">
-        <div class="row">
-            <span class="label">PVP Introducido</span>
-            <span class="value" id="res-pvp">0,00 €</span>
-        </div>
-        <div class="row discount">
-            <span class="label">Descuento Directo</span>
-            <span class="value" id="res-descuento">- 0,00 €</span>
-        </div>
-        <div class="row">
-            <span class="label">Importe a Financiar</span>
-            <span class="value" id="res-financiar">0,00 €</span>
-        </div>
-        
-        <div class="row" id="row-codigo" style="display: none; padding-top: 4px; padding-bottom: 12px;">
-            <span class="label" style="font-size: 13px;">Código Descuento (Caja)</span>
-            <span class="value-codigo" id="res-codigo"></span>
-        </div>
-        
-        <div class="highlight-box">
-            <span class="label"><span id="res-meses">0</span> Cuotas Mensuales de</span>
-            <span class="value" id="res-cuota">0,00 €</span>
-        </div>
-        
-        <div class="vr-box">
-            <span class="label">Valor Residual (Última cuota)</span>
-            <span class="value" id="res-vr">0,00 €</span>
-        </div>
-        
-        <div class="row total">
-            <span class="label">Total pagado al finalizar</span>
-            <span class="value" id="res-total">0,00 €</span>
-        </div>
+        <!-- Card Resultados -->
+        <section class="glass-card hero-result">
+            <div class="quote-showcase">
+                <div class="monthly-highlight">
+                    <div>
+                        <div class="monthly-label"><span id="txt-num-cuotas">24</span> Cuotas mensuales de</div>
+                        <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">TIN 9.95% Repercutido ATOS</div>
+                    </div>
+                    <div class="monthly-val" id="txt-cuota">0,00 <span>€/mes</span></div>
+                </div>
 
-        <p class="disclaimer">
-            *Cálculo matemático exacto aplicando fórmula financiera ATOS (TIN 9.95%). Las cuotas incluyen el prorrateo de los intereses generados por el Valor Residual (VR) durante el periodo.
-        </p>
-    </div>
-</main>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-title">PVP Original</span>
+                        <span class="metric-number" id="txt-pvp">0,00 €</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Descuento</span>
+                        <span class="metric-number discount" id="txt-descuento">- 0,00 €</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Financiado</span>
+                        <span class="metric-number" id="txt-financiado">0,00 €</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-title">Valor Residual</span>
+                        <span class="metric-number vr" id="txt-vr">0,00 €</span>
+                    </div>
+                </div>
 
-<script>
-    function cerrarModal() {
-        const modal = document.getElementById('aviso-modal');
-        const modalContent = modal.querySelector('.modal-content');
-        
-        // Animación de salida fluida
-        modal.style.transition = 'opacity 0.3s ease';
-        modal.style.opacity = '0';
-        modalContent.style.transition = 'transform 0.3s ease';
-        modalContent.style.transform = window.innerWidth < 768 ? 'translateY(100%)' : 'scale(0.95)';
-        
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }, 300);
-    }
+                <div class="total-strip">
+                    <span>Total pagado al finalizar</span>
+                    <span class="total-amount" id="txt-total">0,00 €</span>
+                </div>
+            </div>
+        </section>
 
-    const TIN = 0.0995; 
-
-    const productos = [
-        { modelo: "ZFLIP 8 256GB", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100.0, codigo: "1566965" },
-        { modelo: "ZFLIP 8 512GB", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100.0, codigo: "1566965" },
-        { modelo: "ZFOLD 8 256GB", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFOLD 8 512GB", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFOLD 8 1TB", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFOLD 8 ULTRA 256GB", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFOLD 8 ULTRA 512GB", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFOLD 8 ULTRA 1TB", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150.0, codigo: "1578392" },
-        { modelo: "ZFLIP 7 256GB", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 50.0, codigo: "1566964" },
-        { modelo: "ZFLIP 7 512GB", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 50.0, codigo: "1566964" },
-        { modelo: "ZFOLD 7 256GB", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 50.0, codigo: "1566964" },
-        { modelo: "ZFOLD 7 512GB", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S26 256GB", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70.0, codigo: "1547330" },
-        { modelo: "S26 512 GB", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70.0, codigo: "1547330" },
-        { modelo: "S26+ 256GB", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70.0, codigo: "1547330" },
-        { modelo: "S26+ 512GB", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70.0, codigo: "1547330" },
-        { modelo: "S26 ULTRA 256GB", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100.0, codigo: "1578389" },
-        { modelo: "S26 ULTRA 512GB", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100.0, codigo: "1578389" },
-        { modelo: "S26 ULTRA 1TB", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100.0, codigo: "1578389" },
-        { modelo: "S25 128GB", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 256GB", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 512GB", VR13: 238, VR19: 202.0, VR25: 166, VR37: 112, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 EDGE 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 EDGE 512GB", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25+ 256GB", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25+ 512GB", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 ULTRA 256GB", VR13: 279, VR19: 243.0, VR25: 207, VR37: 162, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 ULTRA 512GB", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 ULTRA 1TB", VR13: 342, VR19: 297.0, VR25: 252, VR37: 211, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 FE 256GB", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50.0, codigo: "1566964" },
-        { modelo: "S25 FE 512GB", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50.0, codigo: "1566964" },
-        { modelo: "A37 256GB", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0.0, codigo: "SIN DESCUENTO" },
-        { modelo: "A57 256GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0, codigo: "1566964" },
-        { modelo: "A57 512GB", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50.0, codigo: "1566964" },
-        { modelo: "WATCH 9 40mm BT", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 9 40mm LTE", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 9 44mm BT", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 9 44mm LTE", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH ULTRA 2 46mm LTE", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 8 40mm BT", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 8 40mm LTE", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 8 44mm BT", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 8 44mm LTE", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80.0, codigo: "1603358" },
-        { modelo: "WATCH 8 CLASSIC 46mm BT", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0.0, codigo: "SIN DESCUENTO" },
-        { modelo: "WATCH 8 CLASSIC 46mm LTE", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0.0, codigo: "SIN DESCUENTO" }
-    ];
-
-    function cargarModelos() {
-        const select = document.getElementById('modelo');
-        select.innerHTML = '';
-        
-        productos.forEach((p, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            let label = p.modelo;
-            option.textContent = label;
-            select.appendChild(option);
-        });
-
-        actualizarPlaceholder();
-    }
-
-    function actualizarPlaceholder() {
-        const select = document.getElementById('modelo');
-        const index = select.value;
-        const selectedDevice = productos[index];
-        
-        document.getElementById('pvp').placeholder = `PVP para ${selectedDevice.modelo}`;
-        calcularFWT();
-    }
-
-    function formatearEuro(numero) {
-        return numero.toFixed(2).replace('.', ',') + ' €';
-    }
-
-    function calcularFWT() {
-        const pvp = parseFloat(document.getElementById('pvp').value) || 0;
-        const plazoTotal = parseInt(document.getElementById('plazo').value); 
-        const mesesCuota = plazoTotal - 1; 
-        
-        const select = document.getElementById('modelo');
-        const selectedDevice = productos[select.value];
-
-        if (!selectedDevice || pvp === 0) {
-            resetearResultados(mesesCuota);
-            return;
-        }
-
-        const descuento = selectedDevice.descuento;
-        const vr = selectedDevice[`VR${plazoTotal}`];
-        const codigo = selectedDevice.codigo;
-        
-        let importeFinanciar = pvp - descuento;
-        if(importeFinanciar <= 0) {
-            resetearResultados(mesesCuota);
-            return;
-        }
-
-        const capitalAmortizar = importeFinanciar - vr; 
-        const rateMensual = TIN / 12;
-
-        let cuotaExacta = 0;
-        let totalPagado = 0;
-
-        if (capitalAmortizar > 0) {
-            let pmt = (capitalAmortizar * rateMensual) / (1 - Math.pow(1 + rateMensual, -mesesCuota));
-            let interesVR = Math.round((vr * rateMensual) * 100) / 100;
-            let prorrateoVR = Math.round((interesVR / mesesCuota) * 100) / 100;
-            cuotaExacta = (Math.round(pmt * 100) / 100) + interesVR + prorrateoVR;
+        <!-- Visual Timeline Card -->
+        <section class="glass-card timeline-wrapper">
+            <div class="timeline-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1428A0" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Línea de Vida de la Financiación
+            </div>
             
-            totalPagado = (cuotaExacta * mesesCuota) + vr;
-        } else {
-            cuotaExacta = 0; 
-            totalPagado = vr;
+            <div class="timeline-bar">
+                <!-- Paso 1 -->
+                <div class="timeline-step">
+                    <div class="step-icon">1</div>
+                    <div class="step-info">
+                        <div class="step-title">
+                            <span>Hoy: Estreno del Dispositivo</span>
+                            <span style="color: var(--success); font-weight: 800;" id="timeline-ahorro">Ahorras 0 €</span>
+                        </div>
+                        <div class="step-desc">Se aplica el descuento directo en el importe a financiar. Entrada: 0 €.</div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="timeline-step">
+                    <div class="step-icon">2</div>
+                    <div class="step-info">
+                        <div class="step-title">
+                            <span>Meses 1 al <span id="timeline-ultimo-mes">24</span></span>
+                            <span style="color: var(--samsung-blue); font-weight: 800;" id="timeline-cuota-mensual">0,00 € / mes</span>
+                        </div>
+                        <div class="step-desc">Cuotas mensuales fijas con amortización periódica del equipo.</div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="timeline-step">
+                    <div class="step-icon final">★</div>
+                    <div class="step-info">
+                        <div class="step-title">
+                            <span>Mes <span id="timeline-mes-vr">25</span>: Momento de Renovación</span>
+                            <span style="color: var(--danger); font-weight: 800;" id="timeline-vr-val">VR: 0,00 €</span>
+                        </div>
+                        <div class="step-desc">
+                            <b>Opción A:</b> Entregas el dispositivo y <b>renuevas</b> por el último Galaxy (no pagas el VR).<br>
+                            <b>Opción B:</b> Abonas la última cuota (VR) y <b>te lo quedas</b> para siempre.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Floating Sidebar Drawer -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+    <aside class="floating-sidebar" id="floating-sidebar">
+        <div class="sidebar-header">
+            <h3>Centro de Actualización</h3>
+            <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
+        </div>
+        <div class="sidebar-body">
+            
+            <!-- Upload Excel -->
+            <div>
+                <label class="field-label" style="margin-bottom: 8px; display: block;">Actualizar Documento Mensual</label>
+                <div class="upload-dropzone" onclick="document.getElementById('excel-file-input').click()">
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-text">Subir Excel FWT (.xlsx)</div>
+                    <div class="upload-sub">Compatible con plantillas mensuales oficiales de Telefonia e Informatica</div>
+                    <input type="file" id="excel-file-input" accept=".xlsx, .xls" style="display: none;" onchange="procesarNuevoExcel(this)">
+                </div>
+            </div>
+
+            <!-- Manual Add Device -->
+            <div>
+                <label class="field-label" style="margin-bottom: 8px; display: block;">Añadir Dispositivo Rápido</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="text" id="manual-modelo" class="glass-input" placeholder="Nombre (Ej: Galaxy Book 4 Pro)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                        <input type="number" id="manual-vr25" class="glass-input" placeholder="VR 25m">
+                        <input type="number" id="manual-desc" class="glass-input" placeholder="Descuento €">
+                    </div>
+                    <button class="btn-action" onclick="anadirDispositivoManual()">Guardar Modelo</button>
+                </div>
+            </div>
+
+            <!-- Reset / Status -->
+            <div style="margin-top: auto; border-top: 1px solid #E2E8F0; padding-top: 14px;">
+                <p class="helper-text" style="margin-bottom: 10px;">
+                    Los datos actualizados se guardan automáticamente en la memoria local de tu navegador.
+                </p>
+                <button class="btn-action btn-secondary" onclick="restablecerOctubre()">Restablecer a Octubre 2026</button>
+            </div>
+
+        </div>
+    </aside>
+
+    <script>
+        // TIN Oficial de ATOS
+        const TIN = 0.0995;
+
+        // Base de Datos Oficial Octubre 2026 (Extraída del Excel Octubre 1004)
+        const CATALOGO_OCTUBRE_DEFAULT = [
+            { modelo: "A37 256GB", categoria: "GALAXY A", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "A57 256GB", categoria: "GALAXY A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "A57 512GB", categoria: "GALAXY A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "GALAXY S25 128GB", categoria: "GALAXY S", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "GALAXY S25 256GB", categoria: "GALAXY S", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "GALAXY S25 512GB", categoria: "GALAXY S", VR13: 238, VR19: 202, VR25: 166, VR37: 112, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "GALAXY S25 EDGE 256GB", categoria: "GALAXY S", VR13: 198, VR19: 173, VR25: 148, VR37: 112, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "GALAXY S25 EDGE 512GB", categoria: "GALAXY S", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "Galaxy S25 FE 256GB", categoria: "GALAXY S", VR13: 234, VR19: 189, VR25: 144, VR37: 103, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "Galaxy S25 FE 512GB", categoria: "GALAXY S", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "GALAXY S25 ULTRA 256GB", categoria: "GALAXY S", VR13: 279, VR19: 243, VR25: 207, VR37: 162, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "GALAXY S25 ULTRA 512GB", categoria: "GALAXY S", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "GALAXY S25 ULTRA 1TB", categoria: "GALAXY S", VR13: 342, VR19: 297, VR25: 252, VR37: 211, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "GALAXY S25+ 256GB", categoria: "GALAXY S", VR13: 198, VR19: 173, VR25: 148, VR37: 112, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "GALAXY S25+ 512GB", categoria: "GALAXY S", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "S26 256GB", categoria: "GALAXY S", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 512 GB", categoria: "GALAXY S", VR13: 346, VR19: 292, VR25: 238, VR37: 166, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 128GB", categoria: "GALAXY S", VR13: 240, VR19: 215, VR25: 190, VR37: 120, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 256GB", categoria: "GALAXY S", VR13: 270, VR19: 250, VR25: 230, VR37: 140, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 512GB", categoria: "GALAXY S", VR13: 315, VR19: 280, VR25: 260, VR37: 190, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26+ 256GB", categoria: "GALAXY S", VR13: 346, VR19: 272, VR25: 198, VR37: 148, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26+ 512GB", categoria: "GALAXY S", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 ULTRA 256GB", categoria: "GALAXY S", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "S26 ULTRA 512GB", categoria: "GALAXY S", VR13: 475, VR19: 395, VR25: 315, VR37: 216, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "S26 ULTRA 1TB", categoria: "GALAXY S", VR13: 548, VR19: 445, VR25: 342, VR37: 252, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFLIP7 256GB", categoria: "GALAXY Z", VR13: 189, VR19: 137, VR25: 85, VR37: 63, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFLIP7 512GB", categoria: "GALAXY Z", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFLIP8 256gb", categoria: "GALAXY Z", VR13: 305, VR19: 235, VR25: 170, VR37: 75, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFLIP8 512gb", categoria: "GALAXY Z", VR13: 330, VR19: 260, VR25: 190, VR37: 100, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFOLD7 256GB", categoria: "GALAXY Z", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFOLD7 512GB", categoria: "GALAXY Z", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFOLD8 256GB", categoria: "GALAXY Z", VR13: 540, VR19: 410, VR25: 280, VR37: 160, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 512GB", categoria: "GALAXY Z", VR13: 580, VR19: 440, VR25: 300, VR37: 180, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 1TB", categoria: "GALAXY Z", VR13: 620, VR19: 480, VR25: 350, VR37: 210, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 256GB", categoria: "GALAXY Z", VR13: 640, VR19: 480, VR25: 330, VR37: 190, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 512GB", categoria: "GALAXY Z", VR13: 680, VR19: 520, VR25: 360, VR37: 215, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 1TB", categoria: "GALAXY Z", VR13: 720, VR19: 565, VR25: 410, VR37: 245, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "Watch 8 40mm BT", categoria: "GALAXY WATCH", VR13: 31, VR19: 20, VR25: 9, VR37: 4, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 40mm LTE", categoria: "GALAXY WATCH", VR13: 39, VR19: 26, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 44mm BT", categoria: "GALAXY WATCH", VR13: 39, VR19: 26, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 44mm LTE", categoria: "GALAXY WATCH", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 Classic 46mm BT", categoria: "GALAXY WATCH", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "Watch 8 Classic 46mm LTE", categoria: "GALAXY WATCH", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "Watch 9 40mm Bluetooth", categoria: "GALAXY WATCH", VR13: 39, VR19: 31, VR25: 22, VR37: 4, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 40mm Cellular", categoria: "GALAXY WATCH", VR13: 48, VR19: 40, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 44mm Bluetooth", categoria: "GALAXY WATCH", VR13: 48, VR19: 40, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 44mm Cellular", categoria: "GALAXY WATCH", VR13: 57, VR19: 48, VR25: 39, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch Ultra2", categoria: "GALAXY WATCH", VR13: 109, VR19: 90, VR25: 70, VR37: 30, descuento: 80, codigo_desc: "1603358" }
+        ];
+
+        let catalogoActual = [];
+        let categoriaFiltro = 'ALL';
+        let plazoSeleccionado = 25;
+
+        // Iniciar
+        function init() {
+            const guardado = localStorage.getItem('samsung_fwt_catalog');
+            const tarifaNombre = localStorage.getItem('samsung_fwt_tarifa_name');
+            if (guardado) {
+                try {
+                    catalogoActual = JSON.parse(guardado);
+                    if (tarifaNombre) document.getElementById('label-tarifa').innerText = tarifaNombre;
+                } catch(e) {
+                    catalogoActual = [...CATALOGO_OCTUBRE_DEFAULT];
+                }
+            } else {
+                catalogoActual = [...CATALOGO_OCTUBRE_DEFAULT];
+            }
+            renderizarSelector();
         }
 
-        document.getElementById('res-pvp').innerText = formatearEuro(pvp);
-        
-        const uiDescuento = document.getElementById('res-descuento');
-        uiDescuento.innerText = '- ' + formatearEuro(descuento);
-        uiDescuento.style.color = descuento > 0 ? "var(--samsung-green)" : "var(--samsung-text-muted)";
-        
-        document.getElementById('res-financiar').innerText = formatearEuro(importeFinanciar);
-        
-        const uiCodigoRow = document.getElementById('row-codigo');
-        const uiCodigo = document.getElementById('res-codigo');
-        
-        if (descuento > 0 && codigo && codigo !== "SIN DESCUENTO") {
-            uiCodigo.innerText = codigo;
-            uiCodigoRow.style.display = 'flex';
-        } else {
-            uiCodigoRow.style.display = 'none';
+        function toggleSidebar() {
+            document.getElementById('floating-sidebar').classList.toggle('active');
+            document.getElementById('sidebar-backdrop').classList.toggle('active');
         }
-        
-        document.getElementById('res-meses').innerText = mesesCuota;
-        document.getElementById('res-cuota').innerText = formatearEuro(cuotaExacta);
-        document.getElementById('res-vr').innerText = formatearEuro(vr);
-        document.getElementById('res-total').innerText = formatearEuro(totalPagado);
-    }
 
-    function resetearResultados(mesesCuota) {
-        document.getElementById('res-pvp').innerText = `0,00 €`;
-        const uiDescuento = document.getElementById('res-descuento');
-        uiDescuento.innerText = `- 0,00 €`;
-        uiDescuento.style.color = "var(--samsung-text-muted)";
-        document.getElementById('res-financiar').innerText = `0,00 €`;
-        
-        document.getElementById('row-codigo').style.display = 'none';
-        
-        document.getElementById('res-meses').innerText = mesesCuota || 0;
-        document.getElementById('res-cuota').innerText = `0,00 €`;
-        document.getElementById('res-vr').innerText = `0,00 €`;
-        document.getElementById('res-total').innerText = `0,00 €`;
-    }
+        function filtrarCategoria(cat, btn) {
+            categoriaFiltro = cat;
+            document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderizarSelector();
+        }
 
-    cargarModelos();
-</script>
+        function renderizarSelector() {
+            const select = document.getElementById('select-modelo');
+            select.innerHTML = '';
 
+            const filtrados = catalogoActual.filter(p => {
+                if (categoriaFiltro === 'ALL') return true;
+                return p.categoria === categoriaFiltro;
+            });
+
+            document.getElementById('product-counter').innerText = `${filtrados.length} Modelos`;
+
+            filtrados.forEach((prod, idx) => {
+                const opt = document.createElement('option');
+                opt.value = catalogoActual.indexOf(prod);
+                
+                let icon = '';
+                if (prod.modelo.includes('FOLD') || prod.modelo.includes('FLIP')) icon = '⚡ ';
+                else if (prod.modelo.includes('ULTRA')) icon = '👑 ';
+
+                opt.textContent = `${icon}${prod.modelo}`;
+                select.appendChild(opt);
+            });
+
+            alCambiarModelo();
+        }
+
+        function seleccionarPlazo(plazo, btn) {
+            plazoSeleccionado = plazo;
+            document.querySelectorAll('.plazo-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            calcular();
+        }
+
+        function alCambiarModelo() {
+            const select = document.getElementById('select-modelo');
+            const prod = catalogoActual[select.value];
+            if (!prod) return;
+
+            document.getElementById('input-pvp').placeholder = `PVP para ${prod.modelo}`;
+            calcular();
+        }
+
+        function calcular() {
+            const select = document.getElementById('select-modelo');
+            const prod = catalogoActual[select.value];
+            const pvpInput = parseFloat(document.getElementById('input-pvp').value);
+            const pvp = isNaN(pvpInput) ? 0 : pvpInput;
+            
+            const plazoTotal = plazoSeleccionado;
+            const mesesCuota = plazoTotal - 1;
+
+            if (!prod || pvp <= 0) {
+                actualizarVistaVacia(mesesCuota, prod);
+                return;
+            }
+
+            const descuento = prod.descuento || 0;
+            const vr = prod[`VR${plazoTotal}`] || 0;
+
+            const importeFinanciar = Math.max(0, pvp - descuento);
+            const capitalAmortizar = Math.max(0, importeFinanciar - vr);
+            const rateMensual = TIN / 12;
+
+            let cuotaExacta = 0;
+            let totalPagado = 0;
+
+            if (capitalAmortizar > 0) {
+                // 1. PMT matemático
+                let pmt = (capitalAmortizar * rateMensual) / (1 - Math.pow(1 + rateMensual, -mesesCuota));
+                // 2. Intereses VR mensuales
+                let interesVR = Math.round((vr * rateMensual) * 100) / 100;
+                // 3. Prorrateo último mes
+                let prorrateoVR = Math.round((interesVR / mesesCuota) * 100) / 100;
+
+                cuotaExacta = (Math.round(pmt * 100) / 100) + interesVR + prorrateoVR;
+                totalPagado = (cuotaExacta * mesesCuota) + vr;
+            } else {
+                cuotaExacta = 0;
+                totalPagado = vr;
+            }
+
+            // Actualizar Métricas
+            document.getElementById('txt-num-cuotas').innerText = mesesCuota;
+            document.getElementById('txt-cuota').innerHTML = `${cuotaExacta.toFixed(2).replace('.', ',')} <span>€/mes</span>`;
+            document.getElementById('txt-pvp').innerText = `${pvp.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-descuento').innerText = `- ${descuento.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-financiado').innerText = `${importeFinanciar.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-vr').innerText = `${vr.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-total').innerText = `${totalPagado.toFixed(2).replace('.', ',')} €`;
+
+            // Actualizar Línea de Tiempo
+            document.getElementById('timeline-ahorro').innerText = descuento > 0 ? `Ahorras ${descuento.toFixed(2).replace('.', ',')} €` : `Sin descuento adicional`;
+            document.getElementById('timeline-ultimo-mes').innerText = mesesCuota;
+            document.getElementById('timeline-cuota-mensual').innerText = `${cuotaExacta.toFixed(2).replace('.', ',')} € / mes`;
+            document.getElementById('timeline-mes-vr').innerText = plazoTotal;
+            document.getElementById('timeline-vr-val').innerText = `VR: ${vr.toFixed(2).replace('.', ',')} €`;
+        }
+
+        function actualizarVistaVacia(mesesCuota, prod) {
+            const vr = prod ? (prod[`VR${plazoSeleccionado}`] || 0) : 0;
+            const desc = prod ? (prod.descuento || 0) : 0;
+            document.getElementById('txt-num-cuotas').innerText = mesesCuota;
+            document.getElementById('txt-cuota').innerHTML = `0,00 <span>€/mes</span>`;
+            document.getElementById('txt-pvp').innerText = `0,00 €`;
+            document.getElementById('txt-descuento').innerText = `- ${desc.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-financiado').innerText = `0,00 €`;
+            document.getElementById('txt-vr').innerText = `${vr.toFixed(2).replace('.', ',')} €`;
+            document.getElementById('txt-total').innerText = `0,00 €`;
+
+            document.getElementById('timeline-ahorro').innerText = desc > 0 ? `Ahorras ${desc} €` : `0 €`;
+            document.getElementById('timeline-ultimo-mes').innerText = mesesCuota;
+            document.getElementById('timeline-cuota-mensual').innerText = `0,00 € / mes`;
+            document.getElementById('timeline-mes-vr').innerText = plazoSeleccionado;
+            document.getElementById('timeline-vr-val').innerText = `VR: ${vr.toFixed(2).replace('.', ',')} €`;
+        }
+
+        // --- SISTEMA DE ACTUALIZACIÓN CON EXCEL DINÁMICO (NOVIEMBRE / DICIEMBRE...) ---
+        function procesarNuevoExcel(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // Buscar hoja de telefonía
+                    let sheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('telefonia')) || workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    const nuevosModelos = [];
+
+                    rows.forEach(r => {
+                        const marca = String(r['MARCA'] || '').toUpperCase();
+                        const modelo = String(r['MODELO'] || '').trim();
+                        
+                        // Si es Samsung
+                        if (marca.includes('SAMSUNG') && modelo && modelo !== 'MODELO') {
+                            const vr13 = parseFloat(r['VR13']) || 0;
+                            const vr19 = parseFloat(r['VR19']) || 0;
+                            const vr25 = parseFloat(r['VR25']) || 0;
+                            const vr37 = parseFloat(r['VR37']) || 0;
+                            const desc = Math.abs(parseFloat(r['descuento']) || 0);
+
+                            let cat = 'OTROS';
+                            const mUp = modelo.toUpperCase();
+                            if (mUp.includes('FLIP') || mUp.includes('FOLD')) cat = 'GALAXY Z';
+                            else if (mUp.includes('S26') || mUp.includes('S25')) cat = 'GALAXY S';
+                            else if (mUp.includes('A37') || mUp.includes('A57')) cat = 'GALAXY A';
+                            else if (mUp.includes('WATCH')) cat = 'GALAXY WATCH';
+                            else if (mUp.includes('BOOK')) cat = 'PORTATILES';
+
+                            nuevosModelos.push({
+                                modelo: modelo,
+                                categoria: cat,
+                                VR13: vr13,
+                                VR19: vr19,
+                                VR25: vr25,
+                                VR37: vr37,
+                                descuento: desc,
+                                codigo_desc: String(r['codigo descuento'] || '')
+                            });
+                        }
+                    });
+
+                    if (nuevosModelos.length > 0) {
+                        catalogoActual = nuevosModelos;
+                        const nombreTarifa = file.name.replace('.xlsx', '').replace('.xls', '');
+                        localStorage.setItem('samsung_fwt_catalog', JSON.stringify(catalogoActual));
+                        localStorage.setItem('samsung_fwt_tarifa_name', nombreTarifa);
+                        
+                        document.getElementById('label-tarifa').innerText = nombreTarifa;
+                        renderizarSelector();
+                        toggleSidebar();
+                        alert(`¡Actualización completada con éxito! Se han cargado ${nuevosModelos.length} modelos de Samsung.`);
+                    } else {
+                        alert('No se encontraron filas con la marca SAMSUNG en el archivo cargado.');
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al leer el archivo Excel. Verifica el formato del archivo.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function anadirDispositivoManual() {
+            const nombre = document.getElementById('manual-modelo').value.trim();
+            const vr25 = parseFloat(document.getElementById('manual-vr25').value) || 0;
+            const desc = parseFloat(document.getElementById('manual-desc').value) || 0;
+
+            if (!nombre) {
+                alert('Introduce al menos el nombre del modelo');
+                return;
+            }
+
+            let cat = 'OTROS';
+            const mUp = nombre.toUpperCase();
+            if (mUp.includes('FLIP') || mUp.includes('FOLD')) cat = 'GALAXY Z';
+            else if (mUp.includes('S26') || mUp.includes('S25')) cat = 'GALAXY S';
+            else if (mUp.includes('BOOK')) cat = 'PORTATILES';
+
+            const nuevo = {
+                modelo: nombre,
+                categoria: cat,
+                VR13: Math.round(vr25 * 1.3),
+                VR19: Math.round(vr25 * 1.15),
+                VR25: vr25,
+                VR37: Math.round(vr25 * 0.7),
+                descuento: desc,
+                codigo_desc: "MANUAL"
+            };
+
+            catalogoActual.unshift(nuevo);
+            localStorage.setItem('samsung_fwt_catalog', JSON.stringify(catalogoActual));
+            renderizarSelector();
+            document.getElementById('manual-modelo').value = '';
+            document.getElementById('manual-vr25').value = '';
+            document.getElementById('manual-desc').value = '';
+            toggleSidebar();
+            alert(`Modelo "${nombre}" añadido correctamente.`);
+        }
+
+        function restablecerOctubre() {
+            if (confirm('¿Restablecer el catálogo a la tarifa oficial de Octubre 2026?')) {
+                localStorage.removeItem('samsung_fwt_catalog');
+                localStorage.removeItem('samsung_fwt_tarifa_name');
+                document.getElementById('label-tarifa').innerText = 'Tarifa Octubre 2026';
+                catalogoActual = [...CATALOGO_OCTUBRE_DEFAULT];
+                renderizarSelector();
+                toggleSidebar();
+            }
+        }
+
+        // Ejecutar al cargar la app
+        window.onload = init;
+    </script>
 </body>
 </html>
