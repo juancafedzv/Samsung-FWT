@@ -46,11 +46,108 @@
             padding: 24px 20px 60px;
             display: flex;
             justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s ease;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+            width: 100%;
+            max-width: 420px;
+            padding: 34px 28px;
+            text-align: center;
+            transform: scale(1);
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-overlay.hidden .login-card {
+            transform: scale(0.94);
+        }
+
+        .login-badge {
+            display: inline-block;
+            background: var(--brand-dark);
+            color: #FFFFFF;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 8px 14px;
+            border-radius: var(--radius-base);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .login-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-heading);
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+        }
+
+        .login-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.4;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .login-error {
+            font-size: 12px;
+            color: var(--status-final);
+            background: var(--status-final-bg);
+            border: 1px solid #FECACA;
+            border-radius: var(--radius-base);
+            padding: 8px 12px;
+            display: none;
         }
 
         .app-shell {
             width: 100%;
             max-width: 1100px;
+            filter: blur(14px);
+            opacity: 0.4;
+            transform: scale(0.985);
+            pointer-events: none;
+            transition: filter 0.65s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .app-shell.unlocked {
+            filter: blur(0px);
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
         }
 
         .top-navbar {
@@ -63,6 +160,8 @@
             border: 1px solid var(--border-subtle);
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .brand-meta {
@@ -94,6 +193,25 @@
             margin-top: 2px;
         }
 
+        .store-pill {
+            background: var(--status-accent-bg);
+            color: var(--brand-primary);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(15, 50, 153, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .btn-tools {
             display: inline-flex;
             align-items: center;
@@ -115,6 +233,24 @@
             color: var(--brand-primary);
         }
 
+        .btn-logout {
+            background: #F1F5F9;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: var(--radius-base);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-logout:hover {
+            background: #E2E8F0;
+            color: var(--text-heading);
+        }
+
+        /* Disposición Principal en 2 Columnas */
         .workspace-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -127,6 +263,7 @@
             }
         }
 
+        /* Tarjeta Estándar */
         .card-panel {
             background: var(--brand-surface);
             border: 1px solid var(--border-subtle);
@@ -669,23 +806,60 @@
 </head>
 <body>
 
-    <div class="app-shell">
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-card">
+            <div class="login-badge">SAMSUNG • MEDIAMARKT</div>
+            <h2 class="login-title">Acceso Comercial FWT</h2>
+            <p class="login-sub">Selecciona tu tienda MediaMarkt e introduce tus credenciales operativas.</p>
+            
+            <form class="login-form" id="login-form" onsubmit="validarLogin(event)">
+                <div class="login-error" id="login-error">Usuario o contraseña incorrectos.</div>
+                
+                <div>
+                    <label class="form-label" for="login-store">Tienda MediaMarkt</label>
+                    <select id="login-store" class="select-control" required>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="form-label" for="login-user">Identificador Comercial</label>
+                    <input type="text" id="login-user" class="input-control" placeholder="Ej: comercial" autocomplete="username" required>
+                </div>
+
+                <div>
+                    <label class="form-label" for="login-pass">Contraseña</label>
+                    <input type="password" id="login-pass" class="input-control" placeholder="••••••••" autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="btn-full" style="margin-top: 6px;">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-shell" id="app-shell">
         
         <header class="top-navbar">
             <div class="brand-meta">
                 <div class="brand-logo-chip">SAMSUNG</div>
                 <div class="brand-titles">
                     <h1>Simulador Forward Trading</h1>
-                    <p><span id="label-tarifa">Tarifa Octubre 2026</span> • <span id="label-conteo">48 modelos disponibles</span></p>
+                    <p>
+                        <span class="store-pill" id="label-tienda-activa">MediaMarkt</span>
+                        <span id="label-tarifa" style="margin-left: 6px;">Tarifa Octubre 2026</span> • 
+                        <span id="label-conteo">48 modelos</span>
+                    </p>
                 </div>
             </div>
-            <button class="btn-tools" onclick="toggleSidebar()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                Gestión de Tarifas
-            </button>
+            <div class="top-actions">
+                <button class="btn-tools" onclick="toggleSidebar()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Gestión de Tarifas
+                </button>
+                <button class="btn-logout" onclick="cerrarSesion()" title="Bloquear sesión">Salir</button>
+            </div>
         </header>
 
         <div class="workspace-grid">
@@ -750,6 +924,7 @@
                     </div>
                     <div class="quote-hero-amount" id="txt-cuota">0,00 <span>€/mes</span></div>
                 </div>
+
                 <table class="ledger-table">
                     <tbody>
                         <tr>
@@ -774,7 +949,6 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <div class="resolution-box">
                     <div class="resolution-title">Opciones al Finalizar el Periodo (Mes <span id="txt-mes-resolucion">25</span>)</div>
                     <div class="resolution-option">
@@ -799,6 +973,7 @@
 
                 <div class="timeline-viewport">
                     <div class="timeline-track" id="timeline-track">
+                        <!-- Nodos generados dinámicamente con animaciones progresivas -->
                     </div>
                 </div>
             </section>
@@ -822,6 +997,7 @@
                     <input type="file" id="input-excel-file" accept=".xlsx, .xls" style="display: none;" onchange="procesarExcel(this)">
                 </div>
             </div>
+
             <div>
                 <label class="form-label" style="display: block; margin-bottom: 8px;">Añadir Dispositivo Manualmente</label>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -847,62 +1023,210 @@
     <script>
         const TIN = 0.0995;
 
+        const TIENDAS_MEDIAMARKT = [
+            "MediaMarkt A Coruña",
+            "MediaMarkt Alcalá de Henares",
+            "MediaMarkt Alcalá de Guadaíra",
+            "MediaMarkt Alcorcón",
+            "MediaMarkt Alfafar (Valencia)",
+            "MediaMarkt Alicante",
+            "MediaMarkt Badajoz",
+            "MediaMarkt Badalona",
+            "MediaMarkt Barakaldo",
+            "MediaMarkt Barcelona (Diagonal Mar)",
+            "MediaMarkt Barcelona (Fontanella)",
+            "MediaMarkt Barcelona (La Maquinista)",
+            "MediaMarkt Barcelona (Splau)",
+            "MediaMarkt Bilbondo",
+            "MediaMarkt Burgos",
+            "MediaMarkt Campanar (Valencia)",
+            "MediaMarkt Carabanchel",
+            "MediaMarkt Castellón",
+            "MediaMarkt Collado Villalba",
+            "MediaMarkt Córdoba",
+            "MediaMarkt Cordovilla (Pamplona)",
+            "MediaMarkt Donosti",
+            "MediaMarkt El Prat",
+            "MediaMarkt Esplugues (Finestrelles)",
+            "MediaMarkt Ferrol",
+            "MediaMarkt Finestrat (Benidorm)",
+            "MediaMarkt Gandía",
+            "MediaMarkt Gavà (Barnasud)",
+            "MediaMarkt Getafe",
+            "MediaMarkt Girona",
+            "MediaMarkt Granada (Nevada)",
+            "MediaMarkt Granada (Ventas)",
+            "MediaMarkt Huelva",
+            "MediaMarkt Jerez de la Frontera",
+            "MediaMarkt Las Arenas (Gran Canaria)",
+            "MediaMarkt Las Palmas (Siete Palmas)",
+            "MediaMarkt Leganés",
+            "MediaMarkt León",
+            "MediaMarkt Lleida",
+            "MediaMarkt Logroño",
+            "MediaMarkt Los Arcos (Sevilla)",
+            "MediaMarkt Los Barrios",
+            "MediaMarkt Lugo",
+            "MediaMarkt Madrid (Benlliure)",
+            "MediaMarkt Madrid (Plaza del Carmen)",
+            "MediaMarkt Madrid (Vallecas)",
+            "MediaMarkt Majadahonda",
+            "MediaMarkt Málaga (Centro)",
+            "MediaMarkt Málaga (Plaza Mayor)",
+            "MediaMarkt Marbella",
+            "MediaMarkt Mataró",
+            "MediaMarkt Mijas (Miramar)",
+            "MediaMarkt Murcia",
+            "MediaMarkt Murcia (Nueva Condomina)",
+            "MediaMarkt Orihuela",
+            "MediaMarkt Palma de Mallorca (Ocimax)",
+            "MediaMarkt Palma de Mallorca (Fan)",
+            "MediaMarkt Parets del Vallès",
+            "MediaMarkt Plenilunio (Madrid)",
+            "MediaMarkt Puerto Real",
+            "MediaMarkt Quart de Poblet",
+            "MediaMarkt Rivas",
+            "MediaMarkt Sabadell",
+            "MediaMarkt Salamanca",
+            "MediaMarkt San Juan de Aznalfarache",
+            "MediaMarkt San Sebastián de los Reyes",
+            "MediaMarkt Sant Antoni (Barcelona)",
+            "MediaMarkt Sant Cugat",
+            "MediaMarkt Santander",
+            "MediaMarkt Santiago de Compostela",
+            "MediaMarkt Sevilla (Lagoh)",
+            "MediaMarkt Siero (Asturias)",
+            "MediaMarkt Tarragona",
+            "MediaMarkt Telde",
+            "MediaMarkt Tenerife (3 de Mayo)",
+            "MediaMarkt Tenerife (La Laguna)",
+            "MediaMarkt Terrassa",
+            "MediaMarkt Toledo",
+            "MediaMarkt Vaguada (Madrid)",
+            "MediaMarkt Valencia (Aqua)",
+            "MediaMarkt Valencia (Colón)",
+            "MediaMarkt Valladolid",
+            "MediaMarkt Vigo",
+            "MediaMarkt Vilanova i la Geltrú",
+            "MediaMarkt Vitoria",
+            "MediaMarkt Zaragoza (GranCasa)",
+            "MediaMarkt Zaragoza (Puerto Venecia)"
+        ];
+
         const CATALOGO_OCTUBRE_BASE = [
-            { modelo: "GALAXY ZFLIP8 256GB", categoria: "Galaxy Z", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100, codigo_desc: "1578389" },
-            { modelo: "GALAXY ZFLIP8 512GB", categoria: "Galaxy Z", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100, codigo_desc: "1578389" },
-            { modelo: "GALAXY ZFOLD8 256GB", categoria: "Galaxy Z", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFOLD8 512GB", categoria: "Galaxy Z", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFOLD8 1TB", categoria: "Galaxy Z", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFOLD8 ULTRA 256GB", categoria: "Galaxy Z", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFOLD8 ULTRA 512GB", categoria: "Galaxy Z", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFOLD8 ULTRA 1TB", categoria: "Galaxy Z", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150, codigo_desc: "1578392" },
-            { modelo: "GALAXY ZFLIP7 256GB", categoria: "Galaxy Z", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY ZFLIP7 512GB", categoria: "Galaxy Z", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY ZFOLD7 256GB", categoria: "Galaxy Z", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY ZFOLD7 512GB", categoria: "Galaxy Z", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY S26 256GB", categoria: "Galaxy S", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26 512 GB", categoria: "Galaxy S", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26 FE 128GB", categoria: "Galaxy S", VR13: 240, VR19: 215.0, VR25: 190, VR37: 120, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26 FE 256GB", categoria: "Galaxy S", VR13: 270, VR19: 250.0, VR25: 230, VR37: 140, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26 FE 512GB", categoria: "Galaxy S", VR13: 315, VR19: 280.0, VR25: 260, VR37: 190, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26+ 256GB", categoria: "Galaxy S", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26+ 512GB", categoria: "Galaxy S", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70, codigo_desc: "1547330" },
-            { modelo: "GALAXY S26 ULTRA 256GB", categoria: "Galaxy S", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100, codigo_desc: "1578389" },
-            { modelo: "GALAXY S26 ULTRA 512GB", categoria: "Galaxy S", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100, codigo_desc: "1578389" },
-            { modelo: "GALAXY S26 ULTRA 1TB", categoria: "Galaxy S", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFLIP8 256GB", categoria: "Galaxy Z", VR13: 305, VR19: 235.0, VR25: 170, VR37: 75, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFLIP8 512GB", categoria: "Galaxy Z", VR13: 330, VR19: 260.0, VR25: 190, VR37: 100, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "ZFOLD8 256GB", categoria: "Galaxy Z", VR13: 540, VR19: 410.0, VR25: 280, VR37: 160, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 512GB", categoria: "Galaxy Z", VR13: 580, VR19: 440.0, VR25: 300, VR37: 180, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 1TB", categoria: "Galaxy Z", VR13: 620, VR19: 480.0, VR25: 350, VR37: 210, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 256GB", categoria: "Galaxy Z", VR13: 640, VR19: 480.0, VR25: 330, VR37: 190, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 512GB", categoria: "Galaxy Z", VR13: 680, VR19: 520.0, VR25: 360, VR37: 215, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFOLD8 ULTRA 1TB", categoria: "Galaxy Z", VR13: 720, VR19: 565.0, VR25: 410, VR37: 245, descuento: 150, codigo_desc: "1578392" },
+            { modelo: "ZFLIP7 256GB", categoria: "Galaxy Z", VR13: 189, VR19: 137.0, VR25: 85, VR37: 63, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFLIP7 512GB", categoria: "Galaxy Z", VR13: 207, VR19: 157.5, VR25: 108, VR37: 81, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFOLD7 256GB", categoria: "Galaxy Z", VR13: 306, VR19: 238.5, VR25: 171, VR37: 144, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "ZFOLD7 512GB", categoria: "Galaxy Z", VR13: 324, VR19: 258.5, VR25: 193, VR37: 166, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "S26 256GB", categoria: "Galaxy S", VR13: 328, VR19: 269.5, VR25: 211, VR37: 144, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 512 GB", categoria: "Galaxy S", VR13: 346, VR19: 292.0, VR25: 238, VR37: 166, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 128GB", categoria: "Galaxy S", VR13: 240, VR19: 215.0, VR25: 190, VR37: 120, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 256GB", categoria: "Galaxy S", VR13: 270, VR19: 250.0, VR25: 230, VR37: 140, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 FE 512GB", categoria: "Galaxy S", VR13: 315, VR19: 280.0, VR25: 260, VR37: 190, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26+ 256GB", categoria: "Galaxy S", VR13: 346, VR19: 272.0, VR25: 198, VR37: 148, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26+ 512GB", categoria: "Galaxy S", VR13: 382, VR19: 303.5, VR25: 225, VR37: 166, descuento: 70, codigo_desc: "1547330" },
+            { modelo: "S26 ULTRA 256GB", categoria: "Galaxy S", VR13: 450, VR19: 364.5, VR25: 279, VR37: 198, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "S26 ULTRA 512GB", categoria: "Galaxy S", VR13: 475, VR19: 395.0, VR25: 315, VR37: 216, descuento: 100, codigo_desc: "1578389" },
+            { modelo: "S26 ULTRA 1TB", categoria: "Galaxy S", VR13: 548, VR19: 445.0, VR25: 342, VR37: 252, descuento: 100, codigo_desc: "1578389" },
             { modelo: "GALAXY S25 128GB", categoria: "Galaxy S", VR13: 189, VR19: 159.5, VR25: 130, VR37: 90, descuento: 50, codigo_desc: "1566964" },
             { modelo: "GALAXY S25 256GB", categoria: "Galaxy S", VR13: 211, VR19: 177.5, VR25: 144, VR37: 103, descuento: 50, codigo_desc: "1566964" },
             { modelo: "GALAXY S25 512GB", categoria: "Galaxy S", VR13: 238, VR19: 202.0, VR25: 166, VR37: 112, descuento: 50, codigo_desc: "1566964" },
             { modelo: "GALAXY S25 EDGE 256GB", categoria: "Galaxy S", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 0, codigo_desc: "SIN DESCUENTO" },
             { modelo: "GALAXY S25 EDGE 512GB", categoria: "Galaxy S", VR13: 243, VR19: 204.5, VR25: 166, VR37: 139, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY S25 FE 256GB", categoria: "Galaxy S", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50, codigo_desc: "1566964" },
-            { modelo: "GALAXY S25 FE 512GB", categoria: "Galaxy S", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "Galaxy S25 FE 256GB", categoria: "Galaxy S", VR13: 234, VR19: 189.0, VR25: 144, VR37: 103, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "Galaxy S25 FE 512GB", categoria: "Galaxy S", VR13: 261, VR19: 213.5, VR25: 166, VR37: 112, descuento: 50, codigo_desc: "1566964" },
             { modelo: "GALAXY S25 ULTRA 256GB", categoria: "Galaxy S", VR13: 279, VR19: 243.0, VR25: 207, VR37: 162, descuento: 0, codigo_desc: "SIN DESCUENTO" },
             { modelo: "GALAXY S25 ULTRA 512GB", categoria: "Galaxy S", VR13: 315, VR19: 265.5, VR25: 216, VR37: 189, descuento: 0, codigo_desc: "SIN DESCUENTO" },
             { modelo: "GALAXY S25 ULTRA 1TB", categoria: "Galaxy S", VR13: 342, VR19: 297.0, VR25: 252, VR37: 211, descuento: 0, codigo_desc: "SIN DESCUENTO" },
             { modelo: "GALAXY S25+ 256GB", categoria: "Galaxy S", VR13: 198, VR19: 173.0, VR25: 148, VR37: 112, descuento: 0, codigo_desc: "SIN DESCUENTO" },
             { modelo: "GALAXY S25+ 512GB", categoria: "Galaxy S", VR13: 225, VR19: 195.5, VR25: 166, VR37: 139, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY A37 256GB", categoria: "Galaxy A", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY A57 256GB", categoria: "Galaxy A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
-            { modelo: "GALAXY A57 512GB", categoria: "Galaxy A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
-            { modelo: "GALAXY Watch 8 40mm BT", categoria: "Galaxy Watch", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 8 40mm LTE", categoria: "Galaxy Watch", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 8 44mm BT", categoria: "Galaxy Watch", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 8 44mm LTE", categoria: "Galaxy Watch", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 8 Classic 46mm BT", categoria: "Galaxy Watch", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY Watch 8 Classic 46mm LTE", categoria: "Galaxy Watch", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0, codigo_desc: "SIN DESCUENTO" },
-            { modelo: "GALAXY Watch 9 40mm Bluetooth", categoria: "Galaxy Watch", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 9 40mm Cellular", categoria: "Galaxy Watch", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 9 44mm Bluetooth", categoria: "Galaxy Watch", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch 9 44mm Cellular", categoria: "Galaxy Watch", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80, codigo_desc: "1603358" },
-            { modelo: "GALAXY Watch Ultra2", categoria: "Galaxy Watch", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80, codigo_desc: "1603358" }
+            { modelo: "A37 256GB", categoria: "Galaxy A", VR13: 112, VR19: 105.5, VR25: 99, VR37: 76, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "A57 256GB", categoria: "Galaxy A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "A57 512GB", categoria: "Galaxy A", VR13: 162, VR19: 148.5, VR25: 135, VR37: 99, descuento: 50, codigo_desc: "1566964" },
+            { modelo: "Watch 8 40mm BT", categoria: "Galaxy Watch", VR13: 31, VR19: 20.0, VR25: 9, VR37: 4, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 40mm LTE", categoria: "Galaxy Watch", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 44mm BT", categoria: "Galaxy Watch", VR13: 39, VR19: 26.0, VR25: 13, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 44mm LTE", categoria: "Galaxy Watch", VR13: 48, VR19: 32.5, VR25: 17, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 8 Classic 46mm BT", categoria: "Galaxy Watch", VR13: 31, VR19: 26.5, VR25: 22, VR37: 9, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "Watch 8 Classic 46mm LTE", categoria: "Galaxy Watch", VR13: 39, VR19: 32.5, VR25: 26, VR37: 13, descuento: 0, codigo_desc: "SIN DESCUENTO" },
+            { modelo: "Watch 9 40mm Bluetooth", categoria: "Galaxy Watch", VR13: 39, VR19: 31.0, VR25: 22, VR37: 4, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 40mm Cellular", categoria: "Galaxy Watch", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 44mm Bluetooth", categoria: "Galaxy Watch", VR13: 48, VR19: 40.0, VR25: 31, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch 9 44mm Cellular", categoria: "Galaxy Watch", VR13: 57, VR19: 48.0, VR25: 39, VR37: 9, descuento: 80, codigo_desc: "1603358" },
+            { modelo: "Watch Ultra2", categoria: "Galaxy Watch", VR13: 109, VR19: 90.0, VR25: 70, VR37: 30, descuento: 80, codigo_desc: "1603358" }
         ];
 
         let catalogoActual = [];
         let filtroCategoria = 'Galaxy Z';
         let plazoSeleccionado = 25;
 
+        // ========================================================
+        // CONTROL DE ACCESO / LOG-IN
+        // ========================================================
+        function cargarTiendasSelect() {
+            const selectStore = document.getElementById('login-store');
+            selectStore.innerHTML = '';
+            TIENDAS_MEDIAMARKT.forEach(tienda => {
+                const opt = document.createElement('option');
+                opt.value = tienda;
+                opt.textContent = tienda;
+                selectStore.appendChild(opt);
+            });
+            const tiendaGuardada = sessionStorage.getItem('fwt_tienda') || localStorage.getItem('fwt_tienda_pref');
+            if (tiendaGuardada) {
+                selectStore.value = tiendaGuardada;
+            }
+        }
+
+        function validarLogin(event) {
+            event.preventDefault();
+            const store = document.getElementById('login-store').value;
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
+            const errorBox = document.getElementById('login-error');
+
+            if ((user === 'samsung' || user === 'comercial') && pass === 'fwt2026') {
+                errorBox.style.display = 'none';
+                sessionStorage.setItem('fwt_auth', 'true');
+                sessionStorage.setItem('fwt_tienda', store);
+                localStorage.setItem('fwt_tienda_pref', store);
+                desbloquearInterfaz(store);
+            } else {
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function desbloquearInterfaz(tienda) {
+            document.getElementById('label-tienda-activa').innerText = tienda || sessionStorage.getItem('fwt_tienda') || 'MediaMarkt';
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('app-shell').classList.add('unlocked');
+        }
+
+        function cerrarSesion() {
+            sessionStorage.removeItem('fwt_auth');
+            document.getElementById('login-pass').value = '';
+            document.getElementById('login-overlay').classList.remove('hidden');
+            document.getElementById('app-shell').classList.remove('unlocked');
+        }
+
+        function verificarSesionPrevia() {
+            cargarTiendasSelect();
+            if (sessionStorage.getItem('fwt_auth') === 'true') {
+                desbloquearInterfaz(sessionStorage.getItem('fwt_tienda'));
+            }
+        }
+
         function initApp() {
+            verificarSesionPrevia();
+
             const guardado = localStorage.getItem('samsung_fwt_data');
             const tarifaNombre = localStorage.getItem('samsung_fwt_title');
             if (guardado) {
