@@ -671,7 +671,6 @@
 
     <div class="app-shell">
         
-        <!-- Barra Superior Corporativa -->
         <header class="top-navbar">
             <div class="brand-meta">
                 <div class="brand-logo-chip">SAMSUNG</div>
@@ -689,17 +688,14 @@
             </button>
         </header>
 
-        <!-- Contenedor Operativo -->
         <div class="workspace-grid">
             
-            <!-- Columna Izquierda: Parámetros de Operación -->
             <section class="card-panel">
                 <div class="panel-heading">
                     <span>Parámetros de la Operación</span>
                     <span style="font-size: 11px; text-transform: none; color: var(--text-muted);">Punto de Venta</span>
                 </div>
 
-                <!-- Filtro por Familia de Producto -->
                 <div class="category-tabs">
                     <button class="btn-tab active" onclick="filtrarCategoria('Galaxy Z', this)">Galaxy Z</button>
                     <button class="btn-tab" onclick="filtrarCategoria('Galaxy S', this)">Galaxy S</button>
@@ -707,21 +703,17 @@
                     <button class="btn-tab" onclick="filtrarCategoria('Galaxy Watch', this)">Galaxy Watch</button>
                 </div>
 
-                <!-- Selección de Modelo -->
                 <div class="form-row">
                     <label class="form-label" for="select-dispositivo">Modelo</label>
                     <select id="select-dispositivo" class="select-control" onchange="alCambiarModelo()">
-                        <!-- Generado por JS -->
                     </select>
                 </div>
 
-                <!-- PVP en Tienda -->
                 <div class="form-row">
                     <label class="form-label" for="input-precio">PVP del Dispositivo (€)</label>
                     <input type="number" id="input-precio" class="input-control" placeholder="0,00" step="0.01" oninput="calcular()">
                 </div>
 
-                <!-- Plazo de Financiación -->
                 <div class="form-row" style="margin-bottom: 0;">
                     <label class="form-label" style="margin-bottom: 4px;">Plazo Operativo (Meses)</label>
                     <div class="tenor-grid">
@@ -745,14 +737,12 @@
                 </div>
             </section>
 
-            <!-- Columna Derecha: Liquidación Financiera -->
             <section class="card-panel">
                 <div class="panel-heading">
                     <span>Propuesta Económica</span>
                     <span style="font-size: 11px; text-transform: none; color: var(--brand-primary); font-weight: 700;">TIN 9,95% ATOS</span>
                 </div>
 
-                <!-- Bloque Destacado de Cuota -->
                 <div class="quote-hero-box">
                     <div>
                         <div class="quote-hero-label"><span id="txt-num-cuotas">24</span> Cuotas Mensuales</div>
@@ -760,8 +750,6 @@
                     </div>
                     <div class="quote-hero-amount" id="txt-cuota">0,00 <span>€/mes</span></div>
                 </div>
-
-                <!-- Tabla de Desglose Contable -->
                 <table class="ledger-table">
                     <tbody>
                         <tr>
@@ -787,7 +775,6 @@
                     </tbody>
                 </table>
 
-                <!-- Opciones al Vencimiento -->
                 <div class="resolution-box">
                     <div class="resolution-title">Opciones al Finalizar el Periodo (Mes <span id="txt-mes-resolucion">25</span>)</div>
                     <div class="resolution-option">
@@ -800,8 +787,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- LÍNEA TEMPORAL ANIMADA COMPLETA (MES A MES) -->
             <section class="card-panel timeline-section">
                 <div class="panel-heading">
                     <span>Cronograma de Pagos y Amortización Mensual</span>
@@ -814,7 +799,6 @@
 
                 <div class="timeline-viewport">
                     <div class="timeline-track" id="timeline-track">
-                        <!-- Nodos generados dinámicamente con animaciones progresivas -->
                     </div>
                 </div>
             </section>
@@ -822,7 +806,6 @@
         </div>
     </div>
 
-    <!-- Panel Lateral Desplegable -->
     <div class="drawer-overlay" id="drawer-overlay" onclick="toggleSidebar()"></div>
     <aside class="sidebar-drawer" id="sidebar-drawer">
         <div class="drawer-header">
@@ -831,7 +814,6 @@
         </div>
         <div class="drawer-body">
             
-            <!-- Zona de Carga de Archivo Excel -->
             <div>
                 <label class="form-label" style="display: block; margin-bottom: 8px;">Importar Nueva Matriz FWT (.xlsx)</label>
                 <div class="upload-card" onclick="document.getElementById('input-excel-file').click()">
@@ -852,7 +834,6 @@
                 </div>
             </div>
 
-            <!-- Restablecer Valores Base -->
             <div style="margin-top: auto; border-top: 1px solid var(--border-subtle); padding-top: 18px;">
                 <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">
                     Los datos quedan guardados localmente en el navegador para sesiones futuras.
